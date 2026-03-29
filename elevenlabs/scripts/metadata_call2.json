@@ -1,0 +1,57 @@
+{
+  "fullbleed": {
+    "directives": [
+      {
+        "sentence_index": 1,
+        "visual_query": "low-angle Air Force One Boeing 707 Houston Dallas Marine One Lyndon Baines Johnson Love Field Airport Vice President 10:45 p.m. golden_hour",
+        "image_motion": "static",
+        "shot_type": "wide",
+        "lighting": "golden_hour"
+      },
+      {
+        "sentence_index": 2,
+        "visual_query": "extreme close-up presidential limousine police car ambulance Dallas Municipal Athletic Department building Parkland Hospital book depository Texas School Book Depository Building Travis Street six shots picket fence chiaroscuro",
+        "image_motion": "static",
+        "shot_type": "extreme_close_up",
+        "lighting": "chiaroscuro"
+      }
+    ]
+  },
+  "text_dominant": {
+    "directives": [
+      {
+        "sentence_index": 3
+      }
+    ]
+  },
+  "stat_callout": {
+    "directives": []
+  },
+  "animated_graphic": {
+    "directives": [
+      {
+        "sentence_index": 0,
+        "animation_type": "timeline",
+        "entry_animation": "draw",
+        "duration_ms": 6000,
+        "animation_data": {
+          "events": [
+            {
+              "date": "1963-11-22T13:00:00Z",
+              "label": "Kennedy Assassination"
+            },
+            {
+              "date": "1963-11-22T19:30:00Z",
+              "label": "Arrival at Parkland Hospital"
+            },
+            {
+              "date": "1963-11-23T01:00:00Z",
+              "label": "Pronounced Dead"
+            }
+          ],
+          "direction": "vertical"
+        }
+      }
+    ]
+  }
+}

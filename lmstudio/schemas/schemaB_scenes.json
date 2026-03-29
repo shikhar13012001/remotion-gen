@@ -1,0 +1,62 @@
+{
+  "_comment": "Call 2 output: one SentenceVisualDirective per sentence. Only 4 templates are valid.",
+  "schemaB_directives": {
+    "type": "object",
+    "required": ["directives"],
+    "additionalProperties": false,
+    "properties": {
+      "directives": {
+        "type": "array",
+        "minItems": 1,
+        "items": {
+          "type": "object",
+          "required": ["sentence_index", "sentence", "duration_ms", "scene_template", "text_treatment", "template_data", "transition_out"],
+          "additionalProperties": false,
+          "properties": {
+            "sentence_index": { "type": "integer", "minimum": 1 },
+            "sentence":       { "type": "string", "minLength": 1 },
+            "duration_ms":    { "type": "integer", "minimum": 2000, "maximum": 8000 },
+            "scene_template": {
+              "type": "string",
+              "enum": ["stat_callout", "animated_graphic", "text_dominant", "fullbleed"]
+            },
+            "text_treatment": {
+              "type": "object",
+              "required": ["accent_words", "animation"],
+              "additionalProperties": false,
+              "properties": {
+                "accent_words": { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 3 },
+                "animation":    { "type": "string", "enum": ["word_by_word", "slam_in", "line_fade"] }
+              }
+            },
+            "template_data": {
+              "type": "object",
+              "required": ["type"],
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "enum": ["stat_callout", "animated_graphic", "text_dominant", "fullbleed"]
+                },
+                "value":          { "type": "number" },
+                "label":          { "type": "string" },
+                "context":        { "type": "string" },
+                "prefix":         { "type": "string" },
+                "suffix":         { "type": "string" },
+                "image_query":    { "type": "string" },
+                "image_motion":   { "type": "string", "enum": ["slow_zoom_in", "slow_zoom_out", "pan_left", "pan_right", "static"] },
+                "animation_type": {
+                  "type": "string",
+                  "enum": ["counter", "timeline", "flow_diagram", "comparison_bars", "bar_chart", "line_chart", "percentage_fill", "map_spread", "world_highlight", "icon_arrangement", "shape_metaphor"]
+                },
+                "animation_data":  { "type": "object" },
+                "entry_animation": { "type": "string", "enum": ["build_in", "slam", "draw"] },
+                "lines":           { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 3 }
+              }
+            },
+            "transition_out": { "type": "string", "enum": ["hard_cut", "crossfade"] }
+          }
+        }
+      }
+    }
+  }
+}

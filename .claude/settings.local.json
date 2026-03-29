@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx remotion:*)",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(xargs wc:*)",
+      "Bash(node -e \"import\\(''./node_modules/zod/index.js''\\).then\\(z => { const r = z.string\\(\\).safeParse\\(1\\); const err = r.error; console.log\\(Object.getOwnPropertyNames\\(err\\)\\); console.log\\(Object.getPrototypeOf\\(err\\).constructor.name\\); }\\)\")",
+      "Bash(ls *.json *.ts)",
+      "Bash(curl -s \"http://localhost:5173/@fs/D:/claude-work/yt-shorts-gen/packages/core/src/index.ts\")"
+    ]
+  }
+}

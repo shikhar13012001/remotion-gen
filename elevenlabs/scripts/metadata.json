@@ -1,0 +1,263 @@
+{
+  "hook": "Dallas. November 22, 1963.",
+  "body": [
+    "Kennedy's assassination on November 22, 1963, in Dallas, Texas, have been a subject of intense historical debate and public interest.",
+    "On the afternoon of Friday, November 22, 1963, President John F.",
+    "Kennedy was assassinated while riding in an open limousine with his wife Jacqueline, Texas Governor John Connally, and Jackie's sister-in-law.",
+    "The president arrived at Parkland Hospital by 7:30 p.m., where he was pronounced dead around 1 a.m.",
+    "the following morning.",
+    "Kennedy had been traveling after returning from an official visit to West Berlin on November 21.",
+    "He traveled from Houston to Dallas, Texas in Air Force One (a Boeing 707), and then used Marine One for his final leg of travel to Dallas.",
+    "He arrived at Love Field Airport at around 10:45 p.m., where he met with Vice President Lyndon Baines Johnson before departing on Air Force One.",
+    "Kennedy's motorcade left the Dallas Municipal Athletic Department building at approximately 12:30, heading toward Parkland Hospital.",
+    "The presidential limousine was followed by a police car and then an ambulance.",
+    "Approximately six shots were fired through the picket fence of a book depository building across from the sixth floor of the Texas School Book Depository Building on Travis Street.",
+    "Kennedy's body was taken to Parkland Hospital, where he died shortly after midnight.",
+    "He is buried in Arlington National Cemetery.",
+    "Jackie Kennedy returned home with her children and received more than 7,000 condolence calls within a day.",
+    "Read more about the assassination of John F.",
+    "Kennedy."
+  ],
+  "cta": "The truth is still debated. Follow for more dark history.",
+  "title": "Dallas, 1963",
+  "contentType": "factual",
+  "mood": "dark",
+  "pacing": "slow",
+  "visualStyle": "cinematic",
+  "accentColor": "#c8a96e",
+  "sceneDirectives": [
+    {
+      "scene_template": "animated_graphic",
+      "image_motion": null,
+      "highlight_words": ["assassination", "historical debate"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "timeline",
+        "data": {
+          "events": [
+            { "date": "Nov 21", "label": "Arrives Texas",       "sublabel": "San Antonio & Houston" },
+            { "date": "12:29 PM","label": "Motorcade departs",  "sublabel": "Dallas city streets" },
+            { "date": "12:30 PM","label": "Shots fired",         "sublabel": "Dealey Plaza" },
+            { "date": "1:00 PM", "label": "Pronounced dead",     "sublabel": "Parkland Hospital" },
+            { "date": "2:38 PM", "label": "LBJ sworn in",        "sublabel": "Air Force One, Dallas" }
+          ],
+          "direction": "vertical"
+        },
+        "entry_animation": "build_in",
+        "duration_ms": 8000
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "text_dominant",
+      "image_motion": null,
+      "highlight_words": ["Friday", "November 22"],
+      "visual_query": null,
+      "animation_spec": null,
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "fullbleed",
+      "image_motion": "slow_zoom_in",
+      "highlight_words": ["assassinated", "limousine"],
+      "visual_query": "wide Dallas Dealey Plaza presidential motorcade open limousine crowds lining Main Street 1963 chiaroscuro overcast grey Texas sky",
+      "animation_spec": null,
+      "shot_type": "wide",
+      "lighting": "chiaroscuro"
+    },
+    {
+      "scene_template": "animated_graphic",
+      "image_motion": null,
+      "highlight_words": ["Parkland Hospital", "pronounced dead"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "timeline",
+        "data": {
+          "events": [
+            { "date": "12:38 PM", "label": "Arrives Parkland",    "sublabel": "Emergency bay entrance" },
+            { "date": "12:46 PM", "label": "Trauma surgery",       "sublabel": "Trauma Room 1" },
+            { "date": "1:00 PM",  "label": "Pronounced dead",      "sublabel": "Dr. Kemp Clark" }
+          ],
+          "direction": "horizontal"
+        },
+        "entry_animation": "build_in",
+        "duration_ms": 5500
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "text_dominant",
+      "image_motion": null,
+      "highlight_words": ["morning"],
+      "visual_query": null,
+      "animation_spec": null,
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "fullbleed",
+      "image_motion": "slow_zoom_out",
+      "highlight_words": ["West Berlin", "November 21"],
+      "visual_query": "wide crowd West Berlin Brandenburg Gate Kennedy Ich bin ein Berliner speech June 1963 golden_hour thousands cheering euphoric",
+      "animation_spec": null,
+      "shot_type": "wide",
+      "lighting": "golden_hour"
+    },
+    {
+      "scene_template": "animated_graphic",
+      "image_motion": null,
+      "highlight_words": ["Houston", "Air Force One"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "flow_diagram",
+        "data": {
+          "nodes": ["Washington D.C.", "San Antonio TX", "Houston TX", "Love Field Dallas", "Dealey Plaza"],
+          "connections": [[0,1],[1,2],[2,3],[3,4]],
+          "style": "arrow_chain"
+        },
+        "entry_animation": "draw",
+        "duration_ms": 6000
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "animated_graphic",
+      "image_motion": null,
+      "highlight_words": ["Love Field", "Johnson"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "map_spread",
+        "data": {
+          "highlight_countries": ["USA", "CAN", "MEX", "GBR", "FRA", "DEU", "ITA", "JPN"],
+          "spread_order": true,
+          "highlight_color": "#c8a96e"
+        },
+        "entry_animation": "build_in",
+        "duration_ms": 5000
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "animated_graphic",
+      "image_motion": null,
+      "highlight_words": ["motorcade", "12:30"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "icon_arrangement",
+        "data": {
+          "icons": ["person", "shield", "map-pin", "warning", "clock"],
+          "layout": "radial",
+          "labels": ["President", "Secret Service", "Dealey Plaza", "Threat", "12:30 PM"]
+        },
+        "entry_animation": "build_in",
+        "duration_ms": 4500
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "animated_graphic",
+      "image_motion": null,
+      "highlight_words": ["limousine", "ambulance"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "flow_diagram",
+        "data": {
+          "nodes": ["Lead Police", "Presidential Limo", "Secret Service", "VP Limousine", "Ambulance"],
+          "connections": [[0,1],[1,2],[2,3],[3,4]],
+          "style": "arrow_chain"
+        },
+        "entry_animation": "build_in",
+        "duration_ms": 4000
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "stat_callout",
+      "image_motion": null,
+      "highlight_words": ["six shots"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "counter",
+        "data": {
+          "value": 6,
+          "suffix": " shots fired"
+        },
+        "entry_animation": "slam",
+        "duration_ms": 5000
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "fullbleed",
+      "image_motion": "slow_zoom_in",
+      "highlight_words": ["Parkland Hospital", "died"],
+      "visual_query": "establishing Parkland Memorial Hospital exterior emergency entrance night Dallas Texas 1963 low_key darkness chiaroscuro dramatic amber floodlights",
+      "animation_spec": null,
+      "shot_type": "establishing",
+      "lighting": "low_key"
+    },
+    {
+      "scene_template": "text_dominant",
+      "image_motion": null,
+      "highlight_words": ["Arlington National Cemetery"],
+      "visual_query": null,
+      "animation_spec": null,
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "stat_callout",
+      "image_motion": null,
+      "highlight_words": ["7,000", "condolence calls"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "counter",
+        "data": {
+          "value": 7000,
+          "suffix": " calls in 24 hrs"
+        },
+        "entry_animation": "slam",
+        "duration_ms": 4500
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "animated_graphic",
+      "image_motion": null,
+      "highlight_words": ["assassination"],
+      "visual_query": null,
+      "animation_spec": {
+        "type": "comparison_bars",
+        "data": {
+          "items": [
+            { "label": "Believe conspiracy", "value": 65 },
+            { "label": "Accept lone gunman",  "value": 35 }
+          ],
+          "unit": "% Americans (2023 poll)"
+        },
+        "entry_animation": "build_in",
+        "duration_ms": 5000
+      },
+      "shot_type": null,
+      "lighting": null
+    },
+    {
+      "scene_template": "text_dominant",
+      "image_motion": null,
+      "highlight_words": ["Kennedy"],
+      "visual_query": null,
+      "animation_spec": null,
+      "shot_type": null,
+      "lighting": null
+    }
+  ]
+}

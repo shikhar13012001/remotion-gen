@@ -1,0 +1,27 @@
+{
+  "type": "object",
+  "required": ["topic", "total_words", "accentColor", "sentences"],
+  "additionalProperties": false,
+  "properties": {
+    "topic": { "type": "string" },
+    "total_words": { "type": "integer", "minimum": 80, "maximum": 220 },
+    "accentColor": { "type": "string", "pattern": "^#[0-9a-fA-F]{6}$" },
+    "sentences": {
+      "type": "array",
+      "minItems": 8,
+      "maxItems": 18,
+      "items": {
+        "type": "object",
+        "required": ["index", "text", "beat", "word_count", "suggested_duration_ms"],
+        "additionalProperties": false,
+        "properties": {
+          "index":                 { "type": "integer", "minimum": 1 },
+          "text":                  { "type": "string", "minLength": 5 },
+          "beat":                  { "type": "string", "enum": ["hook", "build", "turn", "reveal", "breathe", "close"] },
+          "word_count":            { "type": "integer", "minimum": 1, "maximum": 30 },
+          "suggested_duration_ms": { "type": "integer", "minimum": 2000, "maximum": 8000 }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "name": "@yt-shorts/llm",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "dependencies": {
+    "@yt-shorts/core": "*",
+    "openai": "^4.0.0"
+  }
+}

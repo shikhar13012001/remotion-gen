@@ -1,0 +1,2036 @@
+[
+  {
+    "word": "John",
+    "start": 0,
+    "end": 0.244,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "Fitzgerald",
+    "start": 0.302,
+    "end": 0.917,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "(Jack)",
+    "start": 0.987,
+    "end": 1.416,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "Kennedy",
+    "start": 1.44,
+    "end": 1.811,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "was",
+    "start": 1.869,
+    "end": 2.009,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "an",
+    "start": 2.067,
+    "end": 2.125,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "American",
+    "start": 2.159,
+    "end": 2.554,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "politician",
+    "start": 2.612,
+    "end": 3.193,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "and",
+    "start": 3.251,
+    "end": 3.332,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "physician",
+    "start": 3.39,
+    "end": 3.831,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "who",
+    "start": 3.866,
+    "end": 3.982,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "served",
+    "start": 4.04,
+    "end": 4.354,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "as",
+    "start": 4.4,
+    "end": 4.481,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "the",
+    "start": 4.551,
+    "end": 4.621,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "35th",
+    "start": 4.69,
+    "end": 5.213,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "President",
+    "start": 5.271,
+    "end": 5.724,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "of",
+    "start": 5.782,
+    "end": 5.851,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "the",
+    "start": 5.898,
+    "end": 5.968,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "United",
+    "start": 6.014,
+    "end": 6.351,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "States",
+    "start": 6.397,
+    "end": 6.734,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "from",
+    "start": 6.769,
+    "end": 6.908,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "January",
+    "start": 6.978,
+    "end": 7.419,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "1961",
+    "start": 7.477,
+    "end": 7.825,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "until",
+    "start": 7.883,
+    "end": 9.079,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "his",
+    "start": 9.137,
+    "end": 9.242,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "assassination",
+    "start": 9.288,
+    "end": 10.031,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "in",
+    "start": 10.089,
+    "end": 10.147,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "November",
+    "start": 10.205,
+    "end": 10.612,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "1963.",
+    "start": 10.693,
+    "end": 11.947,
+    "sentenceIndex": 0
+  },
+  {
+    "word": "He",
+    "start": 12.063,
+    "end": 12.179,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "was",
+    "start": 12.237,
+    "end": 12.342,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "the",
+    "start": 12.4,
+    "end": 12.469,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "first",
+    "start": 12.527,
+    "end": 12.794,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "baby",
+    "start": 12.852,
+    "end": 13.166,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "of",
+    "start": 13.224,
+    "end": 13.282,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "a",
+    "start": 13.34,
+    "end": 13.363,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "president",
+    "start": 13.433,
+    "end": 13.909,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "to",
+    "start": 13.944,
+    "end": 14.002,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "be",
+    "start": 14.083,
+    "end": 14.153,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "born",
+    "start": 14.199,
+    "end": 14.431,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "in",
+    "start": 14.489,
+    "end": 14.547,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "America,",
+    "start": 14.594,
+    "end": 15.279,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "and",
+    "start": 15.523,
+    "end": 15.662,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "also",
+    "start": 15.743,
+    "end": 16.01,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "the",
+    "start": 16.08,
+    "end": 16.161,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "only",
+    "start": 16.243,
+    "end": 16.51,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "Roman",
+    "start": 16.579,
+    "end": 16.846,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "Catholic",
+    "start": 16.916,
+    "end": 17.357,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "elected",
+    "start": 17.427,
+    "end": 17.81,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "as",
+    "start": 17.856,
+    "end": 17.926,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "President.",
+    "start": 17.996,
+    "end": 18.599,
+    "sentenceIndex": 1
+  },
+  {
+    "word": "Born",
+    "start": 18.982,
+    "end": 19.273,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "on",
+    "start": 19.331,
+    "end": 19.4,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "May",
+    "start": 19.47,
+    "end": 19.609,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "29,",
+    "start": 19.667,
+    "end": 20.352,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "1917",
+    "start": 20.411,
+    "end": 20.794,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "in",
+    "start": 20.863,
+    "end": 21.537,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "Brookline,",
+    "start": 21.606,
+    "end": 22.048,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "Massachusetts.",
+    "start": 22.071,
+    "end": 23.034,
+    "sentenceIndex": 2
+  },
+  {
+    "word": "He",
+    "start": 23.359,
+    "end": 23.487,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "was",
+    "start": 23.545,
+    "end": 23.65,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "the",
+    "start": 23.708,
+    "end": 23.777,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "second",
+    "start": 23.824,
+    "end": 24.137,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "son",
+    "start": 24.219,
+    "end": 24.509,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "of",
+    "start": 24.602,
+    "end": 24.66,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "Joseph",
+    "start": 24.753,
+    "end": 25.136,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "P.",
+    "start": 25.182,
+    "end": 25.345,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "Kennedy",
+    "start": 25.368,
+    "end": 25.751,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "and",
+    "start": 25.809,
+    "end": 25.89,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "his",
+    "start": 25.948,
+    "end": 26.029,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "wife",
+    "start": 26.087,
+    "end": 26.308,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "Rose",
+    "start": 26.378,
+    "end": 26.726,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "to",
+    "start": 26.749,
+    "end": 26.807,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "be",
+    "start": 26.865,
+    "end": 26.935,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "sent",
+    "start": 26.958,
+    "end": 27.167,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "to",
+    "start": 27.202,
+    "end": 27.248,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "boarding",
+    "start": 27.306,
+    "end": 27.597,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "school.",
+    "start": 27.655,
+    "end": 28.073,
+    "sentenceIndex": 3
+  },
+  {
+    "word": "He",
+    "start": 28.456,
+    "end": 28.572,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "was",
+    "start": 28.618,
+    "end": 28.723,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "a",
+    "start": 28.769,
+    "end": 28.792,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "popular",
+    "start": 28.851,
+    "end": 29.245,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "student",
+    "start": 29.303,
+    "end": 29.652,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "who",
+    "start": 29.686,
+    "end": 29.791,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "loved",
+    "start": 29.861,
+    "end": 30.081,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "football,",
+    "start": 30.116,
+    "end": 30.58,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "but",
+    "start": 30.615,
+    "end": 30.766,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "also",
+    "start": 30.813,
+    "end": 31.068,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "an",
+    "start": 31.138,
+    "end": 31.196,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "excellent",
+    "start": 31.254,
+    "end": 31.649,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "debater",
+    "start": 31.695,
+    "end": 32.09,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "and",
+    "start": 32.159,
+    "end": 32.252,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "skilled",
+    "start": 32.322,
+    "end": 32.67,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "musician.",
+    "start": 32.717,
+    "end": 33.344,
+    "sentenceIndex": 4
+  },
+  {
+    "word": "In",
+    "start": 33.669,
+    "end": 33.808,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "January",
+    "start": 33.866,
+    "end": 34.365,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "1928,",
+    "start": 34.423,
+    "end": 35.294,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "the",
+    "start": 35.317,
+    "end": 35.387,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "family",
+    "start": 35.445,
+    "end": 35.747,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "moved",
+    "start": 35.805,
+    "end": 36.037,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "to",
+    "start": 36.06,
+    "end": 36.107,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "New",
+    "start": 36.153,
+    "end": 36.246,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "York",
+    "start": 36.293,
+    "end": 36.467,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "City",
+    "start": 36.525,
+    "end": 36.78,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "where",
+    "start": 36.838,
+    "end": 37.024,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "he",
+    "start": 37.059,
+    "end": 37.117,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "was",
+    "start": 37.175,
+    "end": 37.28,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "enrolled",
+    "start": 37.349,
+    "end": 37.802,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "in",
+    "start": 37.837,
+    "end": 37.895,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "the",
+    "start": 37.93,
+    "end": 38,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "exclusive",
+    "start": 38.058,
+    "end": 38.592,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "Riverdale",
+    "start": 38.638,
+    "end": 39.091,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "Country",
+    "start": 39.137,
+    "end": 39.416,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "School.",
+    "start": 39.463,
+    "end": 39.973,
+    "sentenceIndex": 5
+  },
+  {
+    "word": "A",
+    "start": 40.415,
+    "end": 40.473,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "year",
+    "start": 40.589,
+    "end": 40.728,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "later,",
+    "start": 40.798,
+    "end": 41.216,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "he",
+    "start": 41.39,
+    "end": 41.459,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "entered",
+    "start": 41.541,
+    "end": 41.808,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "Harvard",
+    "start": 41.854,
+    "end": 42.168,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "College",
+    "start": 42.214,
+    "end": 42.586,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "and",
+    "start": 42.609,
+    "end": 42.678,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "graduated",
+    "start": 42.748,
+    "end": 43.294,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "summa",
+    "start": 43.352,
+    "end": 43.607,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "cum",
+    "start": 43.642,
+    "end": 43.781,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "laude",
+    "start": 43.851,
+    "end": 44.165,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "with",
+    "start": 44.211,
+    "end": 44.339,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "a",
+    "start": 44.374,
+    "end": 44.397,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "concentration",
+    "start": 44.455,
+    "end": 45.175,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "in",
+    "start": 45.233,
+    "end": 45.302,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "international",
+    "start": 45.384,
+    "end": 45.964,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "relations.",
+    "start": 46.022,
+    "end": 46.858,
+    "sentenceIndex": 6
+  },
+  {
+    "word": "He",
+    "start": 47.137,
+    "end": 47.253,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "was",
+    "start": 47.311,
+    "end": 47.415,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "president",
+    "start": 47.473,
+    "end": 47.915,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "of",
+    "start": 47.961,
+    "end": 48.019,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "the",
+    "start": 48.054,
+    "end": 48.124,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "Harvardiana",
+    "start": 48.205,
+    "end": 48.867,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "Society,",
+    "start": 48.936,
+    "end": 49.644,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "wrote",
+    "start": 49.761,
+    "end": 50.028,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "for",
+    "start": 50.062,
+    "end": 50.167,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "its",
+    "start": 50.225,
+    "end": 50.329,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "magazine,",
+    "start": 50.387,
+    "end": 50.91,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "and",
+    "start": 50.933,
+    "end": 51.014,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "edited",
+    "start": 51.13,
+    "end": 51.514,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "a",
+    "start": 51.572,
+    "end": 51.595,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "student",
+    "start": 51.653,
+    "end": 51.966,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "newspaper",
+    "start": 52.024,
+    "end": 52.466,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "called",
+    "start": 52.524,
+    "end": 52.826,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "The",
+    "start": 52.942,
+    "end": 53.093,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "Harvard",
+    "start": 53.185,
+    "end": 53.534,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "Crimson.",
+    "start": 53.592,
+    "end": 54.242,
+    "sentenceIndex": 7
+  },
+  {
+    "word": "After",
+    "start": 54.753,
+    "end": 55.031,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "his",
+    "start": 55.078,
+    "end": 55.148,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "graduation",
+    "start": 55.194,
+    "end": 55.716,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "from",
+    "start": 55.763,
+    "end": 55.902,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "college",
+    "start": 55.972,
+    "end": 56.332,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "in",
+    "start": 56.367,
+    "end": 56.413,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "May",
+    "start": 56.471,
+    "end": 56.599,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "of",
+    "start": 56.657,
+    "end": 56.703,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "1940,",
+    "start": 56.761,
+    "end": 57.574,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "he",
+    "start": 57.783,
+    "end": 57.853,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "returned",
+    "start": 57.934,
+    "end": 58.247,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "to",
+    "start": 58.271,
+    "end": 58.317,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "the",
+    "start": 58.375,
+    "end": 58.445,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "United",
+    "start": 58.491,
+    "end": 58.805,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "States",
+    "start": 58.851,
+    "end": 59.153,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "and",
+    "start": 59.188,
+    "end": 59.257,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "joined",
+    "start": 59.315,
+    "end": 59.548,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "the",
+    "start": 59.571,
+    "end": 59.641,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "Navy.",
+    "start": 59.687,
+    "end": 60.14,
+    "sentenceIndex": 8
+  },
+  {
+    "word": "He",
+    "start": 60.418,
+    "end": 60.535,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "served",
+    "start": 60.604,
+    "end": 60.894,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "on",
+    "start": 60.941,
+    "end": 61.011,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "PT-109",
+    "start": 61.092,
+    "end": 61.73,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "during",
+    "start": 61.754,
+    "end": 62.496,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "World",
+    "start": 62.566,
+    "end": 62.775,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "War",
+    "start": 62.81,
+    "end": 62.961,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "II,",
+    "start": 63.03,
+    "end": 63.46,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "where",
+    "start": 63.669,
+    "end": 63.878,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "he",
+    "start": 63.913,
+    "end": 63.959,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "received",
+    "start": 64.041,
+    "end": 64.377,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "a",
+    "start": 64.4,
+    "end": 64.424,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "military",
+    "start": 64.47,
+    "end": 64.888,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "citation",
+    "start": 64.946,
+    "end": 65.457,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "for",
+    "start": 65.503,
+    "end": 65.608,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "heroism",
+    "start": 65.678,
+    "end": 66.177,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "and",
+    "start": 66.293,
+    "end": 66.444,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "was",
+    "start": 66.502,
+    "end": 66.595,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "awarded",
+    "start": 66.641,
+    "end": 67.013,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "the",
+    "start": 67.059,
+    "end": 67.129,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "Navy",
+    "start": 67.187,
+    "end": 67.477,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "and",
+    "start": 67.535,
+    "end": 67.605,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "Marine",
+    "start": 67.663,
+    "end": 67.953,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "Corps",
+    "start": 68,
+    "end": 68.232,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "Achievement",
+    "start": 68.255,
+    "end": 68.685,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "Medal.",
+    "start": 68.731,
+    "end": 69.161,
+    "sentenceIndex": 9
+  },
+  {
+    "word": "Upon",
+    "start": 69.439,
+    "end": 69.718,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "returning",
+    "start": 69.788,
+    "end": 70.136,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "from",
+    "start": 70.171,
+    "end": 70.298,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "active",
+    "start": 70.356,
+    "end": 70.647,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "service,",
+    "start": 70.681,
+    "end": 71.181,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "he",
+    "start": 71.332,
+    "end": 71.39,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "entered",
+    "start": 71.459,
+    "end": 71.692,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "private",
+    "start": 71.726,
+    "end": 72.04,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "practice",
+    "start": 72.063,
+    "end": 72.435,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "in",
+    "start": 72.469,
+    "end": 72.516,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "Boston.",
+    "start": 72.574,
+    "end": 73.131,
+    "sentenceIndex": 10
+  },
+  {
+    "word": "He",
+    "start": 73.456,
+    "end": 73.561,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "was",
+    "start": 73.607,
+    "end": 73.7,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "elected",
+    "start": 73.758,
+    "end": 74.083,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "to",
+    "start": 74.118,
+    "end": 74.164,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "the",
+    "start": 74.223,
+    "end": 74.292,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "House",
+    "start": 74.327,
+    "end": 74.536,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "of",
+    "start": 74.559,
+    "end": 74.617,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "Representative",
+    "start": 74.675,
+    "end": 75.302,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "in",
+    "start": 75.337,
+    "end": 75.384,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "1946,",
+    "start": 75.442,
+    "end": 76.765,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "becoming",
+    "start": 77.044,
+    "end": 77.438,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "a",
+    "start": 77.485,
+    "end": 77.508,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "representative",
+    "start": 77.566,
+    "end": 78.193,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "for",
+    "start": 78.216,
+    "end": 78.321,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "Massachusetts'",
+    "start": 78.367,
+    "end": 79.134,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "11th",
+    "start": 79.192,
+    "end": 79.656,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "congressional",
+    "start": 79.702,
+    "end": 80.225,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "district.",
+    "start": 80.283,
+    "end": 80.898,
+    "sentenceIndex": 11
+  },
+  {
+    "word": "He",
+    "start": 81.281,
+    "end": 81.397,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "was",
+    "start": 81.444,
+    "end": 81.548,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "the",
+    "start": 81.606,
+    "end": 81.676,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "youngest",
+    "start": 81.734,
+    "end": 82.059,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "member",
+    "start": 82.117,
+    "end": 82.361,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "of",
+    "start": 82.419,
+    "end": 82.466,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "his",
+    "start": 82.512,
+    "end": 82.582,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "party's",
+    "start": 82.64,
+    "end": 82.976,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "delegation",
+    "start": 83.011,
+    "end": 83.545,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "to",
+    "start": 83.592,
+    "end": 83.638,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "Congress",
+    "start": 83.708,
+    "end": 84.103,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "from",
+    "start": 84.137,
+    "end": 84.265,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "that",
+    "start": 84.312,
+    "end": 84.474,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "day",
+    "start": 84.555,
+    "end": 84.857,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "until",
+    "start": 85.101,
+    "end": 85.356,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "November",
+    "start": 85.426,
+    "end": 85.786,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "22,",
+    "start": 85.844,
+    "end": 86.669,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "1963.",
+    "start": 86.82,
+    "end": 88.167,
+    "sentenceIndex": 12
+  },
+  {
+    "word": "In",
+    "start": 88.979,
+    "end": 89.142,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "1952",
+    "start": 89.211,
+    "end": 89.56,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "he",
+    "start": 89.618,
+    "end": 90.233,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "was",
+    "start": 90.28,
+    "end": 90.384,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "appointed",
+    "start": 90.419,
+    "end": 90.767,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "to",
+    "start": 90.802,
+    "end": 90.86,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "the",
+    "start": 90.918,
+    "end": 90.988,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "Senate",
+    "start": 91.034,
+    "end": 91.324,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "by",
+    "start": 91.359,
+    "end": 91.452,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "Governor",
+    "start": 91.533,
+    "end": 91.847,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "John",
+    "start": 91.928,
+    "end": 92.218,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "F.",
+    "start": 92.288,
+    "end": 92.416,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "Fitzgerald,",
+    "start": 92.439,
+    "end": 93.136,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "and",
+    "start": 93.159,
+    "end": 93.24,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "became",
+    "start": 93.31,
+    "end": 93.6,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "a",
+    "start": 93.635,
+    "end": 93.658,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "popular",
+    "start": 93.728,
+    "end": 94.146,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "representative.",
+    "start": 94.204,
+    "end": 95.051,
+    "sentenceIndex": 13
+  },
+  {
+    "word": "He",
+    "start": 95.376,
+    "end": 95.516,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "married",
+    "start": 95.585,
+    "end": 95.899,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "Jacqueline",
+    "start": 95.945,
+    "end": 96.375,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "Lee",
+    "start": 96.41,
+    "end": 96.561,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "Bouvier",
+    "start": 96.607,
+    "end": 97.037,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "on",
+    "start": 97.129,
+    "end": 97.211,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "September",
+    "start": 97.257,
+    "end": 97.652,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "13,",
+    "start": 97.722,
+    "end": 98.441,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "1953",
+    "start": 98.499,
+    "end": 98.836,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "at",
+    "start": 98.883,
+    "end": 99.568,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "Grace",
+    "start": 99.626,
+    "end": 99.905,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "Church",
+    "start": 99.951,
+    "end": 100.265,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "in",
+    "start": 100.311,
+    "end": 100.357,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "New",
+    "start": 100.404,
+    "end": 100.497,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "York",
+    "start": 100.543,
+    "end": 100.741,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "City.",
+    "start": 100.81,
+    "end": 101.333,
+    "sentenceIndex": 14
+  },
+  {
+    "word": "They",
+    "start": 101.542,
+    "end": 101.704,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "had",
+    "start": 101.739,
+    "end": 101.844,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "three",
+    "start": 101.878,
+    "end": 102.099,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "children:",
+    "start": 102.134,
+    "end": 102.587,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "John",
+    "start": 102.668,
+    "end": 102.912,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "Jr.,",
+    "start": 102.993,
+    "end": 103.597,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "Arabella,",
+    "start": 103.713,
+    "end": 104.409,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "and",
+    "start": 104.444,
+    "end": 104.584,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "Caroline.",
+    "start": 104.665,
+    "end": 105.396,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "On",
+    "start": 105.837,
+    "end": 105.988,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "November",
+    "start": 106.046,
+    "end": 106.383,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "22,",
+    "start": 106.441,
+    "end": 107.114,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "the",
+    "start": 107.138,
+    "end": 107.207,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "day",
+    "start": 107.277,
+    "end": 107.405,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "of",
+    "start": 107.463,
+    "end": 107.509,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "his",
+    "start": 107.556,
+    "end": 107.637,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "assassination,",
+    "start": 107.695,
+    "end": 108.659,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "little",
+    "start": 108.775,
+    "end": 109.03,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "John",
+    "start": 109.077,
+    "end": 109.286,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "was",
+    "start": 109.344,
+    "end": 109.436,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "four",
+    "start": 109.518,
+    "end": 109.704,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "years",
+    "start": 109.762,
+    "end": 109.971,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "old.",
+    "start": 110.029,
+    "end": 110.47,
+    "sentenceIndex": 15
+  },
+  {
+    "word": "In",
+    "start": 110.911,
+    "end": 111.05,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "January",
+    "start": 111.12,
+    "end": 111.619,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "1962",
+    "start": 111.677,
+    "end": 112.722,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "President",
+    "start": 113.001,
+    "end": 113.442,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "Kennedy",
+    "start": 113.488,
+    "end": 113.825,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "established",
+    "start": 113.883,
+    "end": 114.417,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "the",
+    "start": 114.452,
+    "end": 114.522,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "Peace",
+    "start": 114.58,
+    "end": 114.835,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "Corps,",
+    "start": 114.881,
+    "end": 115.439,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "a",
+    "start": 115.648,
+    "end": 115.706,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "volunteer",
+    "start": 115.822,
+    "end": 116.298,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "program",
+    "start": 116.368,
+    "end": 116.797,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "designed",
+    "start": 116.867,
+    "end": 117.215,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "to",
+    "start": 117.238,
+    "end": 117.285,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "help",
+    "start": 117.343,
+    "end": 117.494,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "developing",
+    "start": 117.552,
+    "end": 118.005,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "countries.",
+    "start": 118.074,
+    "end": 118.748,
+    "sentenceIndex": 16
+  },
+  {
+    "word": "In",
+    "start": 118.991,
+    "end": 119.142,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "April",
+    "start": 119.212,
+    "end": 119.502,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "of",
+    "start": 119.56,
+    "end": 119.607,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "that",
+    "start": 119.653,
+    "end": 119.792,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "year",
+    "start": 119.862,
+    "end": 120.071,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "he",
+    "start": 120.164,
+    "end": 120.222,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "addressed",
+    "start": 120.268,
+    "end": 120.663,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "the",
+    "start": 120.698,
+    "end": 120.768,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "nation",
+    "start": 120.826,
+    "end": 121.128,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "from",
+    "start": 121.186,
+    "end": 121.325,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "Fort",
+    "start": 121.383,
+    "end": 121.615,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "Worth,",
+    "start": 121.673,
+    "end": 121.987,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "Texas",
+    "start": 122.022,
+    "end": 122.602,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "on",
+    "start": 122.695,
+    "end": 122.858,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "a",
+    "start": 122.904,
+    "end": 122.939,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "tour",
+    "start": 122.997,
+    "end": 123.241,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "promoting",
+    "start": 123.299,
+    "end": 123.717,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "economic",
+    "start": 123.775,
+    "end": 124.239,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "development",
+    "start": 124.297,
+    "end": 124.785,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "across",
+    "start": 124.82,
+    "end": 125.121,
+    "sentenceIndex": 17
+  },
+  {
+    "word": "America.",
+    "start": 125.168,
+    "end": 125.853,
+    "sentenceIndex": 17
+  }
+]

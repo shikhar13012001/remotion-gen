@@ -1,0 +1,53 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Output / Generated files
+output/
+temp/
+tmp/
+downloads/
+*.mp4
+*.mp3
+*.wav
+*.avi
+*.mov
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Python (if applicable)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Build
+dist/
+build/
+
+# Miscellaneous
+*.bak
+*.tmp
+.cache/

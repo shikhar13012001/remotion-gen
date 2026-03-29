@@ -1,0 +1,23 @@
+Point one:
+
+
+
+"There is already a solution in place for name matching. It works well for what it does. But it was built for US name patterns, it runs on fixed rules, and when it cannot make a decision — and it cannot make a lot of them — the case goes to a CT agent. A human. Manually."
+
+
+
+Tip: The US based system has no feedback loop, same pairs will go through system again, for manual work, which in turn increases the Turn around Time.
+
+
+
+
+
+Point two:
+
+
+
+"But MONSIEUR is male. MME is female. These are two different people who happen to share a surname. Approving this is a fraud risk."
+
+
+
+Tip: the current matching system strips of any title that is present, MR, Mrs .. that sort of thing
