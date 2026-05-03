@@ -1,7 +1,9 @@
 export { analyzeAndStructure, generateVideoSpec, videoSpecToMetadata } from "./orchestrate.js";
 export { runCall1b } from "./call1b.js";
+export { TokenMapSchema } from "./types.js";
 export type {
   // New canonical types
+  TokenMap,
   Beat,
   ScriptSentence,
   ScriptPackage,

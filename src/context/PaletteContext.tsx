@@ -9,17 +9,17 @@ export interface PaletteContextValue {
   overlay_scrim: string; // rgba(0,0,0,0.55)
 }
 
-/** Parse a #rrggbb hex string to rgba(r,g,b,alpha). Falls back to accent purple on bad input. */
+/** Parse a #rrggbb hex string to rgba(r,g,b,alpha). Falls back to gold on bad input. */
 function hexToRgba(hex: string, alpha: number): string {
   const clean = hex.replace("#", "");
-  if (clean.length !== 6) return `rgba(167,139,250,${alpha})`;
+  if (clean.length !== 6) return `rgba(200,169,110,${alpha})`;
   const r = parseInt(clean.slice(0, 2), 16);
   const g = parseInt(clean.slice(2, 4), 16);
   const b = parseInt(clean.slice(4, 6), 16);
   return `rgba(${r},${g},${b},${alpha})`;
 }
 
-const DEFAULT_ACCENT = "#a78bfa";
+const DEFAULT_ACCENT = "#c8a96e";
 
 const defaultPalette: PaletteContextValue = {
   background:    "#0d0d0d",

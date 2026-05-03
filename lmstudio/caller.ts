@@ -1,13 +1,41 @@
 import OpenAI from "openai";
 import { TEXT_CLEAN_PREFIX } from "./constants.js";
 import type { LMCallOptions } from "./types.js";
+import * as dotenv from "dotenv";
 
+try { dotenv.config(); } catch {}
 const LM_STUDIO_BASE_URL = process.env.LM_STUDIO_URL ?? "http://localhost:1234/v1";
 const OPENAI_API_KEY     = process.env.OPENAI_API_KEY ?? "lm-studio";
 
 export const model = process.env.LM_STUDIO_MODEL ?? "local-model";
 
 const client = new OpenAI({ baseURL: LM_STUDIO_BASE_URL, apiKey: OPENAI_API_KEY });
+
+/**
+ * Returns the raw text content of a chat completion with no JSON processing.
+ * Use for code generation, prose, or any non-JSON output.
+ */
+export async function callLMStudioText(
+  systemPrompt: string,
+  userMessage:  string,
+  options:      LMCallOptions = {}
+): Promise<string> {
+  const { model: m = model, temperature = 0.4, maxTokens = 10000 } = options;
+
+  const completion = await client.chat.completions.create({
+    model:      m,
+    temperature,
+    max_tokens: maxTokens,
+    messages: [
+      { role: "system", content: systemPrompt },
+      { role: "user",   content: userMessage  },
+    ],
+  });
+
+  const text = completion.choices[0]?.message?.content?.trim() ?? "";
+  if (!text) throw new Error("Model returned an empty response.");
+  return text;
+}
 
 function extractJSON(raw: string): string {
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);

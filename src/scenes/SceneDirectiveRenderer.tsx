@@ -161,9 +161,9 @@ function convertToLegacy(d: SentenceVisualDirective) {
     ? td.image_query
     : null;
   const animationSpec = td.type === "animated_graphic"
-    ? { type: td.animation_type, data: td.animation_data, entry_animation: td.entry_animation as "build_in" | "slam" | "draw", duration_ms: d.duration_ms }
+    ? { type: td.animation_type, data: td.animation_data, entry_animation: td.entry_animation as "build_in" | "slam" | "draw", duration_ms: 0 }
     : td.type === "stat_callout"
-      ? { type: "counter", data: { value: td.value, prefix: td.prefix ?? "", suffix: td.suffix ?? "" }, entry_animation: "slam" as const, duration_ms: d.duration_ms }
+      ? { type: "counter", data: { value: td.value, prefix: td.prefix ?? "", suffix: td.suffix ?? "" }, entry_animation: "slam" as const, duration_ms: 0 }
       : null;
 
   return {

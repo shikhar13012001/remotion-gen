@@ -35,7 +35,6 @@ export function validateImageQuery(query: string | undefined): boolean {
 export function buildTextDominantFallback(
   sentenceIndex: number,
   sentenceText:  string,
-  durationMs:    number
 ): SentenceVisualDirective {
   // Split sentence into visual lines (max 6 words per line)
   const words  = sentenceText.split(" ");
@@ -52,7 +51,7 @@ export function buildTextDominantFallback(
   return {
     sentence_index: sentenceIndex,
     sentence:       sentenceText,
-    duration_ms:    Math.max(2000, durationMs),
+    // timing comes from ElevenLabs only — see computeSentenceDurations
     scene_template: "text_dominant",
     text_treatment: {
       accent_words: validateAccentWords([], sentenceText),
@@ -98,12 +97,12 @@ export function sanitizeDirective(
 ): SentenceVisualDirective {
   const sentence = script.sentences[idx];
   if (!sentence) {
-    return buildTextDominantFallback(idx + 1, "", 2000);
+    return buildTextDominantFallback(idx + 1, "");
   }
 
   if (!raw || typeof raw !== "object") {
     console.warn(`  [validate] Sentence ${idx + 1}: not an object — using text_dominant fallback`);
-    return buildTextDominantFallback(sentence.index, sentence.text, sentence.suggested_duration_ms);
+    return buildTextDominantFallback(sentence.index, sentence.text);
   }
 
   const d = raw as Record<string, unknown>;
@@ -146,9 +145,8 @@ export function sanitizeDirective(
     d.transition_out = "hard_cut";
   }
 
-  // Ensure duration is in range
-  const dur = typeof d.duration_ms === "number" ? d.duration_ms : sentence.suggested_duration_ms;
-  d.duration_ms = Math.min(8000, Math.max(2000, Math.round(dur / 100) * 100));
+  // timing comes from ElevenLabs only — see computeSentenceDurations
+  delete (d as Record<string, unknown>)["duration_ms"];
 
   return d as unknown as SentenceVisualDirective;
 }
@@ -169,7 +167,6 @@ export function validateDirectivesArray(
       result.push(buildTextDominantFallback(
         script.sentences[i].index,
         script.sentences[i].text,
-        script.sentences[i].suggested_duration_ms
       ));
     }
   }

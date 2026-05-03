@@ -1,15 +1,54 @@
 import * as fs from "fs";
 import * as path from "path";
 import { runCall1 } from "./call1.js";
-import { runCall1b } from "./call1b.js";
-import { runCall2, runDistributionRepair } from "./call2.js";
-import { logDistribution } from "./validate.js";
+import { runCall2 } from "./call2.js";
 import { logVideoSpecSummary } from "../trace.js";
-import type { VideoSpec, ContentMetadata, ScriptPackage, SentenceVisualDirective, VisualBrief } from "./types.js";
+import type {
+  VideoSpec,
+  ContentMetadata,
+  ScriptPackage,
+  ScriptSentence,
+  SentenceVisualDirective,
+  TokenMap,
+} from "./types.js";
 
 function timer(): () => string {
   const t = Date.now();
   return () => `${((Date.now() - t) / 1000).toFixed(1)}s`;
+}
+
+// ─── Image fetcher ─────────────────────────────────────────────────────────────
+
+/**
+ * Fetches one image per scene that needs one.
+ * Skips scenes where needsImage is false or visualQuery is null — returns null at those indices.
+ * Currently a stub: replace the inner fetch with a real image API call.
+ */
+export async function fetchImages(scenes: ScriptSentence[]): Promise<(string | null)[]> {
+  return Promise.all(
+    scenes.map(async (scene) => {
+      if (!scene.needsImage || !scene.visualQuery) return null;
+      // TODO: replace with real image API call (e.g. Unsplash, Pexels, Google Images)
+      // const imageUrl = await imageApi.search(scene.visualQuery);
+      // return imageUrl;
+      console.log(`  [images] Would fetch: "${scene.visualQuery}"`);
+      return null;
+    })
+  );
+}
+
+// ─── Parallel step result types ────────────────────────────────────────────────
+
+export interface ParallelStepResult {
+  resolvedImages:  (string | null)[];
+  directives:      SentenceVisualDirective[];
+  /** Raw audio result — caller converts to sentenceDurations */
+  audioScriptPath: string;
+}
+
+export interface ParallelStepError {
+  step:    "fetchImages" | "generateComposition" | "runTTS";
+  message: string;
 }
 
 /** Convert new VideoSpec to legacy ContentMetadata for backward-compat consumers. */
@@ -60,13 +99,18 @@ export function videoSpecToMetadata(spec: VideoSpec): ContentMetadata {
 
 export async function generateVideoSpec(
   rawContent: string,
-  options: { temperature?: number; outputDir?: string } = {}
+  options: {
+    temperature?: number;
+    outputDir?:   string;
+    guide?:       string;
+    tokens?:      TokenMap;
+  } = {}
 ): Promise<{ videoSpec: VideoSpec; metadata: ContentMetadata; script: string; savedTo: string }> {
   const outputDir = options.outputDir ?? path.join(__dirname, "..", "data", "output");
   fs.mkdirSync(outputDir, { recursive: true });
 
   console.log("\n╔═══════════════════════════════════════════╗");
-  console.log("  ║   LM Studio · Visual Director Pipeline    ║");
+  console.log("  ║        LM Studio · Script Generation      ║");
   console.log("  ╚═══════════════════════════════════════════╝");
 
   // ── CALL 1: Script writer ──────────────────────────────────────────────────
@@ -74,94 +118,103 @@ export async function generateVideoSpec(
   let script: ScriptPackage;
 
   try {
-    script = await runCall1(rawContent, { temperature: options.temperature });
+    script = await runCall1(rawContent, { temperature: options.temperature, guide: options.guide });
   } catch (err) {
     console.warn(`  ✗  Call 1 failed (${t1()}) — aborting`);
     throw err;
   }
   console.log(`  ✓  Call 1 done (${t1()})`);
 
-  const call1Path = path.join(outputDir, "metadata_call1.json");
-  fs.writeFileSync(call1Path, JSON.stringify(script, null, 2), "utf-8");
-  console.log(`     Saved → ${call1Path}`);
+  // ── Save outputs ───────────────────────────────────────────────────────────
+  const scriptJsonPath = path.join(outputDir, "script.json");
+  fs.writeFileSync(scriptJsonPath, JSON.stringify(script, null, 2), "utf-8");
 
-  // ── CALL 1b: Director's brief ──────────────────────────────────────────────
-  const t1b = timer();
-  let brief: VisualBrief;
+  // output.txt — plain narration text, consumed by ElevenLabs TTS step
+  const savedTo    = path.join(outputDir, "output.txt");
+  const scriptText = script.sentences.map(s => s.text).join(" ");
+  fs.writeFileSync(savedTo, scriptText, "utf-8");
 
-  try {
-    brief = await runCall1b(script, { temperature: options.temperature });
-  } catch (err) {
-    console.warn(`  ✗  Call 1b failed (${t1b()}) — aborting`);
-    throw err;
-  }
-  console.log(`  ✓  Call 1b done (${t1b()})`);
+  console.log(`  Saved → ${scriptJsonPath}`);
+  console.log(`  Saved → ${savedTo}\n`);
 
-  const call1bPath = path.join(outputDir, "metadata_call1b.json");
-  fs.writeFileSync(call1bPath, JSON.stringify(brief, null, 2), "utf-8");
-  console.log(`     Saved → ${call1bPath}`);
-
-  // ── CALL 2: Visual director ────────────────────────────────────────────────
-  const t2 = timer();
-  let directives: SentenceVisualDirective[];
-
-  try {
-    directives = await runCall2(script, { temperature: options.temperature, brief });
-  } catch (err) {
-    console.warn(`  ✗  Call 2 failed (${t2()}) — aborting`);
-    throw err;
-  }
-  console.log(`  ✓  Call 2 done (${t2()})`);
-
-  const call2Path = path.join(outputDir, "metadata_call2.json");
-  fs.writeFileSync(call2Path, JSON.stringify(directives, null, 2), "utf-8");
-  console.log(`     Saved → ${call2Path}`);
-
-  // ── Distribution repair (safety net — brief is guidance, model may still ignore it) ──
-  const textDomPct =
-    directives.filter(d => d.scene_template === "text_dominant").length / directives.length;
-
-  if (textDomPct > 0.40) {
-    console.log(`  ⚠️  text_dominant at ${Math.round(textDomPct * 100)}% — running distribution repair…`);
-    const repaired    = await runDistributionRepair(directives, script, { temperature: options.temperature });
-    const repairedPct = repaired.filter(d => d.scene_template === "text_dominant").length / repaired.length;
-    if (repairedPct < textDomPct) {
-      console.log(`  ✓  Distribution improved → ${Math.round(repairedPct * 100)}% text_dominant`);
-      directives = repaired;
-    } else {
-      console.log(`  ⚠  Repair did not improve distribution — keeping original`);
-    }
-  }
-
-  logDistribution(directives);
-
-  // ── Build VideoSpec ────────────────────────────────────────────────────────
   const videoSpec: VideoSpec = {
     topic:       script.topic,
     accentColor: script.accentColor,
     sentences:   script.sentences,
-    directives,
+    directives:  [],
   };
 
-  // Also produce legacy ContentMetadata for backward compat
   const metadata = videoSpecToMetadata(videoSpec);
   logVideoSpecSummary(videoSpec);
 
-  // Save outputs
-  const scriptText  = script.sentences.map(s => s.text).join(" ");
-  const savedTo     = path.join(outputDir, "output.txt");
-  const metaPath    = path.join(outputDir, "metadata.json");
-  const specPath    = path.join(outputDir, "videospec.json");
-
-  fs.writeFileSync(metaPath, JSON.stringify(metadata, null, 2), "utf-8");
-  fs.writeFileSync(specPath, JSON.stringify(videoSpec, null, 2), "utf-8");
-  fs.writeFileSync(savedTo, scriptText, "utf-8");
-
-  console.log(`  Saved → ${specPath}  (${directives.length} directives)`);
-  console.log(`  Saved → ${metaPath}`);
-  console.log(`  Saved → ${savedTo}\n`);
-
   return { videoSpec, metadata, script: scriptText, savedTo };
+}
+
+/**
+ * Runs image fetch, TTS, and Call 2 in parallel after Call 1 completes.
+ * Returns a typed result so callers can identify which step failed.
+ *
+ * @param scenes        ScriptSentence[] from Call 1
+ * @param guide         Content-type guide markdown (injected into Call 2)
+ * @param tokens        Design tokens (passed to Call 2 for color guidance)
+ * @param scriptPath    Path to saved script.json (used by TTS step)
+ * @param publicDir     Output dir for audio files
+ * @param audioName     Filename for generated mp3
+ * @param timingName    Filename for generated timing JSON
+ * @param audioOpts     Options passed to generateAudioStep
+ */
+export async function runParallelStep(
+  scenes:     ScriptPackage,
+  guide:      string | undefined,
+  _tokens:    TokenMap | undefined,
+  scriptPath: string,
+  publicDir:  string,
+  audioName:  string,
+  timingName: string,
+  audioOpts:  { skipAudio: boolean; voiceId?: string },
+): Promise<{
+  resolvedImages: (string | null)[];
+  directives:     SentenceVisualDirective[];
+  audioFile:      string;
+  wordTimings:    import("../elevenlabs/index.js").WordTiming[];
+  durationSec:    number;
+}> {
+  const { generateAudioStep } = await import("../pipelineAudio.js");
+
+  const [resolvedImages, directives, audioResult] = await Promise.all([
+    fetchImages(scenes.sentences).catch((err: unknown) => {
+      throw Object.assign(
+        new Error(`fetchImages failed: ${err instanceof Error ? err.message : String(err)}`),
+        { step: "fetchImages" }
+      );
+    }),
+
+    runCall2(scenes, { brief: undefined, guide }).catch((err: unknown) => {
+      throw Object.assign(
+        new Error(`generateComposition (Call 2) failed: ${err instanceof Error ? err.message : String(err)}`),
+        { step: "generateComposition" }
+      );
+    }),
+
+    generateAudioStep(scriptPath, publicDir, audioName, timingName, {
+      skipAudio:     audioOpts.skipAudio,
+      voiceId:       audioOpts.voiceId,
+      sentenceTexts: scenes.sentences.map(s => s.text),
+    }).catch((err: unknown) => {
+      throw Object.assign(
+        new Error(`runTTS failed: ${err instanceof Error ? err.message : String(err)}`),
+        { step: "runTTS" }
+      );
+    }),
+  ]);
+
+  return {
+    resolvedImages,
+    directives,
+    audioFile:   audioResult.audioFile,
+    wordTimings: audioResult.wordTimings,
+    durationSec: audioResult.durationSec,
+  };
 }
 
 /** @deprecated Use generateVideoSpec instead */

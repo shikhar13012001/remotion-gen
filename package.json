@@ -12,10 +12,13 @@
     "render": "npx tsx scripts/render-local.ts",
     "gen:audio": "npx tsx elevenlabs/generate.ts",
     "pipeline": "npx tsx pipeline.ts",
+    "extract-tokens": "npx tsx scripts/extract-tokens.ts",
     "demo": "npx tsx scripts/render-demo.ts",
-    "render:existing": "npx tsx scripts/render-existing.ts"
+    "render:existing": "npx tsx scripts/render-existing.ts",
+    "compose": "npx tsx scripts/compose.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.80.0",
     "@remotion/cli": "^4.0.0",
     "@remotion/google-fonts": "4.0.435",
     "@remotion/light-leaks": "4.0.435",

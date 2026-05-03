@@ -95,7 +95,35 @@ SELF-CHECK — before outputting JSON, verify:
   □ at least 2 "breathe" sentences, at least 1 "reveal", at least 1 "turn"
   □ every sentence follows logically from the previous one
   □ the CLOSE echoes or reframes the HOOK
+  □ every "breathe" and "close" sentence has needsImage=false and visualQuery=null
+  □ every highlightWords array contains only words verbatim from the sentence text
+  □ every dataValue is a raw number (no commas, no units) or null
 If any check fails, rewrite before outputting.
+
+PER-SENTENCE VISUAL FIELDS — populate for every sentence:
+
+visualQuery (string | null):
+  A specific, photo-researcher-grade image search query for this sentence.
+  Rules: 5+ words. Subject + context + time period if relevant.
+  Good: "CERN Large Hadron Collider tunnel blue rings 2008"
+  Bad:  "science lab"
+  Set to null for: breathe beats, close beats, and any sentence where an animation is more
+  appropriate than a photograph (statistics, comparisons, sequences, abstract concepts).
+
+needsImage (boolean):
+  true  → this sentence benefits from a photographic background (fullbleed or subject scene).
+  false → this sentence is a breathe/close beat, pure data, or abstract concept.
+  Rule: set to false whenever visualQuery is null.
+
+highlightWords (string[]):
+  1–3 words that carry the sentence's emotional or factual weight. Verbatim from the text.
+  Never: "the", "a", "an", "is", "was", "were", "in", "on", "at", "to", "of", "and".
+  These will be rendered in the accent color at higher weight.
+
+dataValue (number | null):
+  The primary numeric value mentioned in the sentence (raw digits, no commas).
+  null when no number is present.
+  Examples: "sixty-six million" → 66000000, "ninety-seven percent" → 97, "1908" → 1908
 
 OUTPUT FORMAT — return this JSON object exactly:
 {
@@ -108,7 +136,11 @@ OUTPUT FORMAT — return this JSON object exactly:
       "text": "exact sentence text",
       "beat": "hook" | "build" | "turn" | "reveal" | "breathe" | "close",
       "word_count": number,
-      "suggested_duration_ms": number
+      "suggested_duration_ms": number,
+      "visualQuery": "specific 5+ word image search query" | null,
+      "needsImage": true | false,
+      "highlightWords": ["word1", "word2"],
+      "dataValue": number | null
     }
   ]
 }

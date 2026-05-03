@@ -17,34 +17,59 @@ const REPAIR_PROMPT =
   "Return ONLY the corrected ScriptPackage JSON object, nothing else.\n" +
   "No markdown fences. No explanation. Just the JSON.\n\n" +
   "Required: topic (string), total_words (integer), accentColor (#rrggbb), " +
-  "sentences array with index/text/beat/word_count/suggested_duration_ms per item.\n\n" +
+  "sentences array with index/text/beat/word_count/suggested_duration_ms/" +
+  "visualQuery/needsImage/highlightWords/dataValue per item.\n\n" +
   "Previous broken output:\n";
 
 const MIN_SENTENCES = 8;
 const MAX_ATTEMPTS  = 3;
 
-function buildUserMessage(rawContent: string, attempt: number): string {
+function buildUserMessage(rawContent: string, attempt: number, guide?: string): string {
   const prefix = attempt > 1
     ? `IMPORTANT: Your previous response had too few sentences. ` +
       `You MUST write exactly 10–16 sentences in the sentences array. ` +
       `First sentence beat MUST be "hook". Last sentence beat MUST be "close".\n\n`
     : "";
-  return `${prefix}Topic: ${rawContent.trim()}`;
+  const guideSection = guide
+    ? `CREATIVE GUIDE FOR THIS CATEGORY:\n${"─".repeat(60)}\n${guide}\n${"─".repeat(60)}\n\n`
+    : "";
+  return `${guideSection}${prefix}Topic: ${rawContent.trim()}`;
 }
 
 function coerceScriptPackage(raw: Record<string, unknown>): ScriptPackage {
   const sentences = Array.isArray(raw.sentences) ? raw.sentences as Record<string, unknown>[] : [];
 
-  const cleaned = sentences.map((s, i) => ({
-    index:                 typeof s.index  === "number" ? s.index  : i + 1,
-    text:                  typeof s.text   === "string" ? s.text   : "",
-    beat:                  (["hook","build","turn","reveal","breathe","close"] as const)
-                             .includes(s.beat as "hook") ? s.beat as ScriptPackage["sentences"][0]["beat"] : "build",
-    word_count:            typeof s.word_count === "number" ? s.word_count : (s.text as string ?? "").split(" ").length,
-    suggested_duration_ms: typeof s.suggested_duration_ms === "number"
-                             ? Math.min(8000, Math.max(2000, s.suggested_duration_ms))
-                             : 3000,
-  }));
+  const cleaned = sentences.map((s, i) => {
+    const text = typeof s.text === "string" ? s.text : "";
+    const beat = (["hook","build","turn","reveal","breathe","close"] as const)
+      .includes(s.beat as "hook") ? s.beat as ScriptPackage["sentences"][0]["beat"] : "build";
+    const isImageless = beat === "breathe" || beat === "close";
+
+    const rawQuery = typeof s.visualQuery === "string" ? s.visualQuery.trim() : null;
+    const visualQuery = rawQuery && rawQuery.split(/\s+/).length >= 4 && !isImageless
+      ? rawQuery
+      : null;
+
+    const rawHighlights = Array.isArray(s.highlightWords)
+      ? (s.highlightWords as unknown[]).filter((w): w is string => typeof w === "string")
+      : [];
+    const lowerText = text.toLowerCase();
+    const highlightWords = rawHighlights.filter(w => lowerText.includes(w.toLowerCase())).slice(0, 3);
+
+    return {
+      index:                 typeof s.index  === "number" ? s.index  : i + 1,
+      text,
+      beat,
+      word_count:            typeof s.word_count === "number" ? s.word_count : text.split(" ").length,
+      suggested_duration_ms: typeof s.suggested_duration_ms === "number"
+                               ? Math.min(8000, Math.max(2000, s.suggested_duration_ms))
+                               : 3000,
+      visualQuery,
+      needsImage:            typeof s.needsImage === "boolean" ? s.needsImage && !isImageless : visualQuery !== null,
+      highlightWords,
+      dataValue:             typeof s.dataValue === "number" && isFinite(s.dataValue) ? s.dataValue : null,
+    };
+  });
 
   // Ensure first is hook, last is close
   if (cleaned.length > 0 && cleaned[0].beat !== "hook")   cleaned[0].beat  = "hook";
@@ -76,7 +101,7 @@ function coerceScriptPackage(raw: Record<string, unknown>): ScriptPackage {
 
 export async function runCall1(
   rawContent: string,
-  opts: { temperature?: number } = {}
+  opts: { temperature?: number; guide?: string } = {}
 ): Promise<ScriptPackage> {
   console.log("\n  ── CALL 1: Script writer ──────────────────────────────");
 
@@ -89,7 +114,7 @@ export async function runCall1(
     try {
       result = await callLMStudioJSON<Record<string, unknown>>(
         PROMPT_CALL1,
-        buildUserMessage(rawContent, attempt),
+        buildUserMessage(rawContent, attempt, opts.guide),
         { model, temperature: opts.temperature ?? 0.6, maxTokens: 3000, schema: SCHEMA_A, schemaName: "script_package" }
       );
     } catch (parseErr) {
@@ -98,7 +123,7 @@ export async function runCall1(
       try {
         const rawStr = await callLMStudioRaw(
           PROMPT_CALL1,
-          buildUserMessage(rawContent, attempt),
+          buildUserMessage(rawContent, attempt, opts.guide),
           { model, temperature: opts.temperature ?? 0.6, maxTokens: 3000 }
         );
         const repairMsg = REPAIR_PROMPT + rawStr;

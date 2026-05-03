@@ -1,5 +1,23 @@
 // ─── All exported types for the lmstudio pipeline ─────────────────────────────
 
+import { z } from "zod";
+
+// ─── Design token types ────────────────────────────────────────────────────────
+
+export const TokenMapSchema = z.object({
+  fontFamily:  z.string(),
+  colors:      z.record(z.string(), z.string()),
+  typography:  z.record(z.string(), z.object({
+    size:       z.string(),
+    weight:     z.number(),
+    lineHeight: z.number(),
+  })),
+  spacing:     z.record(z.string(), z.string()),
+  radii:       z.record(z.string(), z.string()),
+});
+
+export type TokenMap = z.infer<typeof TokenMapSchema>;
+
 // ─── Call 1 output: ScriptPackage ─────────────────────────────────────────────
 
 export type Beat = "hook" | "build" | "turn" | "reveal" | "breathe" | "close";
@@ -10,6 +28,14 @@ export interface ScriptSentence {
   beat:                  Beat;
   word_count:            number;
   suggested_duration_ms: number;
+  /** Specific image search query for fullbleed/subject scenes; null for breathe, close, or data-only sentences. */
+  visualQuery:           string | null;
+  /** True when this sentence would benefit from a photographic background. */
+  needsImage:            boolean;
+  /** 1–3 key words that carry emotional or factual weight; verbatim from sentence text. */
+  highlightWords:        string[];
+  /** Primary numeric value mentioned in the sentence; null when no number is present. */
+  dataValue:             number | null;
 }
 
 export interface ScriptPackage {
@@ -149,7 +175,7 @@ export type TemplateData =
 export interface SentenceVisualDirective {
   sentence_index: number;
   sentence:       string;
-  duration_ms:    number;
+  // timing comes from ElevenLabs only — see computeSentenceDurations
   scene_template: SceneTemplate;
   text_treatment: {
     accent_words: string[];

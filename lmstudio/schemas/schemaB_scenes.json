@@ -10,12 +10,11 @@
         "minItems": 1,
         "items": {
           "type": "object",
-          "required": ["sentence_index", "sentence", "duration_ms", "scene_template", "text_treatment", "template_data", "transition_out"],
+          "required": ["sentence_index", "sentence", "scene_template", "text_treatment", "template_data", "transition_out"],
           "additionalProperties": false,
           "properties": {
             "sentence_index": { "type": "integer", "minimum": 1 },
             "sentence":       { "type": "string", "minLength": 1 },
-            "duration_ms":    { "type": "integer", "minimum": 2000, "maximum": 8000 },
             "scene_template": {
               "type": "string",
               "enum": ["stat_callout", "animated_graphic", "text_dominant", "fullbleed"]

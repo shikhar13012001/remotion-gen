@@ -1,5 +1,4 @@
-import { computeSentenceBoundaries } from "../utils/sentenceBoundaries";
-import type { Props } from "../compositions/ShortsComposition";
+import { computeSentenceBoundaries, type WordTiming } from "../utils/sentenceBoundaries";
 
 const FPS              = 30;
 const TAIL_PADDING     = 12;
@@ -12,7 +11,7 @@ const MIN_DURATION_FRAMES = 1200;
  * Legacy model: [hook, body1..bodyN, cta_extra] — used when no VideoSpec.
  */
 export function computeSentenceDurations(
-  wordTimings: Props["wordTimings"],
+  wordTimings: WordTiming[],
 ): { sentenceDurations: number[]; totalDuration: number } {
   const boundaries = computeSentenceBoundaries(wordTimings);
 
@@ -41,7 +40,7 @@ export function computeSentenceDurations(
  * to suggested_duration_ms in that case.
  */
 export function computeSentenceDurationsForVideoSpec(
-  wordTimings: Props["wordTimings"],
+  wordTimings: WordTiming[],
   totalSentences: number,
 ): { sentenceDurations: number[]; totalDuration: number } {
   const boundaries = computeSentenceBoundaries(wordTimings);

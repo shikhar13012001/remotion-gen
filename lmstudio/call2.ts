@@ -21,8 +21,7 @@ const REPAIR_PROMPT_PREFIX =
   "Critical fixes needed:\n" +
   "- template_data objects must have a 'type' field matching the scene_template\n" +
   "- accent_words must be an array of strings, never null\n" +
-  "- Every object needs transition_out: 'hard_cut' or 'crossfade'\n" +
-  "- duration_ms must be an integer between 2000 and 8000\n\n" +
+  "- Every object needs transition_out: 'hard_cut' or 'crossfade'\n\n" +
   "Previous broken output:\n";
 
 const DISTRIBUTION_REPAIR_PREFIX =
@@ -35,7 +34,7 @@ const DISTRIBUTION_REPAIR_PREFIX =
   "Valid scene_template values: fullbleed, text_dominant, stat_callout, animated_graphic\n" +
   "DO NOT use: editorial_headline, subject_cutout, split_photo_data, transition_wipe\n\n" +
   "Return a JSON object with a 'directives' key containing the complete corrected array.\n" +
-  "Same item count. Same sentence text. Never change: sentence, duration_ms, transition_out, accent_words.\n" +
+  "Same item count. Same sentence text. Never change: sentence, transition_out, accent_words.\n" +
   "Only change scene_template and template_data where a rule applies.\n\n" +
   "Current array:\n";
 
@@ -128,7 +127,7 @@ function extractArray(result: unknown): unknown[] {
 
 export async function runCall2(
   script: ScriptPackage,
-  opts: { temperature?: number; brief?: VisualBrief } = {}
+  opts: { temperature?: number; brief?: VisualBrief; guide?: string } = {}
 ): Promise<SentenceVisualDirective[]> {
   console.log(`\n  ── CALL 2: Visual director (${script.sentences.length} sentences) ──────────`);
 
@@ -150,7 +149,10 @@ export async function runCall2(
     },
   };
 
-  const userMessage = buildVisualDirectorInput(script, opts.brief);
+  const guideHeader = opts.guide
+    ? `CREATIVE GUIDE:\n${"─".repeat(60)}\n${opts.guide}\n${"─".repeat(60)}\n\n`
+    : "";
+  const userMessage = guideHeader + buildVisualDirectorInput(script, opts.brief);
 
   // ── Primary call ────────────────────────────────────────────────────────────
   let rawArray: unknown[] = [];
@@ -187,7 +189,7 @@ export async function runCall2(
       console.warn(`  ✗  Repair failed — using text_dominant fallbacks for all sentences`);
       console.warn(repairErr instanceof Error ? repairErr.message : repairErr);
       return script.sentences.map(s =>
-        buildTextDominantFallback(s.index, s.text, s.suggested_duration_ms)
+        buildTextDominantFallback(s.index, s.text)
       );
     }
   }
@@ -195,7 +197,7 @@ export async function runCall2(
   if (rawArray.length === 0) {
     console.warn(`  ⚠  Call 2 returned 0 items — using text_dominant fallbacks`);
     return script.sentences.map(s =>
-      buildTextDominantFallback(s.index, s.text, s.suggested_duration_ms)
+      buildTextDominantFallback(s.index, s.text)
     );
   }
 

@@ -12,6 +12,7 @@ output/
 temp/
 tmp/
 downloads/
+src/compositions/GeneratedComposition.tsx
 *.mp4
 *.mp3
 *.wav

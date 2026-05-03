@@ -21,14 +21,12 @@ export async function generateAudioStep(
   opts: { skipAudio: boolean; voiceId?: string; sentenceTexts?: string[] },
 ): Promise<AudioResult> {
   if (opts.skipAudio) {
-    console.log("STEP 3/4 — Skipping audio (--skip-audio)\n");
     return { audioFile: "", wordTimings: [], durationSec: 0 };
   }
   if (!process.env.ELEVENLABS_API_KEY) {
-    console.warn("STEP 3/4 — Skipping audio: ELEVENLABS_API_KEY not set.\n");
+    console.warn("  ELEVENLABS_API_KEY not set — skipping audio.");
     return { audioFile: "", wordTimings: [], durationSec: 0 };
   }
-  console.log("STEP 3/4 — Generating voice over + timestamps...");
   // Lazy import to avoid circular dep at module level
   const { generateWithTimestamps } = await import("./elevenlabs/index.js");
   const result = await generateWithTimestamps(scriptPath, "output.mp3", { voiceId: opts.voiceId, sentenceTexts: opts.sentenceTexts });

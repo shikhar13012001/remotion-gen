@@ -25,7 +25,6 @@ STEP 0 → transition_wipe
   These are the ≤6-word typographic wipes between sections — dark frame, accent line, label.
   → label: 1–3 word section title that names what just ended or what's coming
     (e.g. "The Numbers", "What Followed", "The Cost", "Why It Matters")
-  → duration_ms: 2000ms (fixed)
 
 STEP 1 → stat_callout
   The sentence revolves around ONE key number that IS the entire point.
@@ -164,15 +163,6 @@ ACCENT WORDS RULES:
 - NEVER choose: the, a, an, is, was, were, in, on, at, to, of, and, but, or
 - Choose the word that carries emotional or factual weight
 
-DURATION RULES:
-- Base: use suggested_duration_ms from input
-- stat_callout: add 1200ms (counter animation needs runway)
-- animated_graphic with line_chart/bar_chart: add 800ms
-- timeline: add 1000ms per event beyond 3 events (base: suggested_duration_ms + 1000ms)
-- flow_diagram: add 600ms per node beyond 3 nodes
-- editorial_headline: add 600ms
-- Minimum 2000ms. Maximum 8000ms. Round to nearest 100ms.
-
 TRANSITION RULES:
 - hard_cut:  default — clean, editorial
 - crossfade: after "breathe" beats and before "reveal" beats only
@@ -229,7 +219,6 @@ Exactly one directive per input sentence, in the same order.
   {
     "sentence_index": 1,
     "sentence": "exact sentence text copied from input",
-    "duration_ms": 3200,
     "scene_template": "animated_graphic",
     "text_treatment": { "accent_words": ["word1", "word2"], "animation": "word_by_word" },
     "template_data": { "type": "animated_graphic", "animation_type": "counter", "animation_data": { "value": 66000000, "suffix": " dead" }, "entry_animation": "slam" },
