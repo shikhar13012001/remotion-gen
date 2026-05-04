@@ -125,7 +125,15 @@ async function main() {
   }
 }
 
-main().catch((err) => {
-  stepFail(`Audio workflow failed: ${err instanceof Error ? err.message : err}`);
-  process.exit(1);
-});
+// CLI entry point — only runs when this file is executed directly
+const isMain = process.argv[1] && (
+  process.argv[1].endsWith("workflow.ts") ||
+  process.argv[1].endsWith("workflow.js")
+);
+
+if (isMain) {
+  main().catch((err) => {
+    stepFail(`Audio workflow failed: ${err instanceof Error ? err.message : err}`);
+    process.exit(1);
+  });
+}

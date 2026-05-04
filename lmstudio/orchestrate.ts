@@ -5,7 +5,6 @@ import { logVideoSpecSummary } from "../trace.js";
 import type {
   VideoSpec,
   ScriptPackage,
-  TokenMap,
 } from "./types.js";
 
 function timer(): () => string {
@@ -21,7 +20,7 @@ export async function generateVideoSpec(
     temperature?: number;
     outputDir?:   string;
     guide?:       string;
-    tokens?:      TokenMap;
+    design?:      string;
   } = {}
 ): Promise<{ videoSpec: VideoSpec; savedTo: string }> {
   const outputDir = options.outputDir ?? path.join(__dirname, "..", "data", "output");
@@ -35,8 +34,37 @@ export async function generateVideoSpec(
   const t1 = timer();
   let script: ScriptPackage;
 
+  // Resolve guide path → read file content so the LLM receives the actual guide,
+  // not just a file path string.
+  let guideContent: string | undefined;
+  if (options.guide) {
+    const guideAbs = path.isAbsolute(options.guide)
+      ? options.guide
+      : path.resolve(process.cwd(), options.guide);
+    if (fs.existsSync(guideAbs)) {
+      guideContent = fs.readFileSync(guideAbs, "utf-8");
+      console.log(`  Guide: ${options.guide}`);
+    } else {
+      console.warn(`  ⚠  Guide not found (skipping): ${options.guide}`);
+    }
+  }
+
+  // Resolve design path → read DESIGN.md content so the LLM gets color/type/spacing values.
+  let designContent: string | undefined;
+  if (options.design) {
+    const designAbs = path.isAbsolute(options.design)
+      ? options.design
+      : path.resolve(process.cwd(), options.design);
+    if (fs.existsSync(designAbs)) {
+      designContent = fs.readFileSync(designAbs, "utf-8");
+      console.log(`  Design: ${options.design}`);
+    } else {
+      console.warn(`  ⚠  Design file not found (skipping): ${options.design}`);
+    }
+  }
+
   try {
-    script = await runCall1(rawContent, { temperature: options.temperature, guide: options.guide });
+    script = await runCall1(rawContent, { temperature: options.temperature, guide: guideContent, design: designContent });
   } catch (err) {
     console.warn(`  ✗  Call 1 failed (${t1()}) — aborting`);
     throw err;

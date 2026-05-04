@@ -4,6 +4,8 @@ import {
   ShortsComposition,
   type Props,
 } from "./compositions/ShortsComposition";
+import { ReitComposition } from "./compositions/reits-guide";
+import { ReitsWhatTheyAreComposition } from "./compositions/reits-what-they-are/index";
 import kennedyScript from "../data/output/script.json";
 
 const FPS = 30;
@@ -79,6 +81,26 @@ export const Root: React.FC = () => {
       <Composition
         id="ShortsComposition"
         component={ShortsComposition}
+        fps={FPS}
+        width={1080}
+        height={1920}
+        durationInFrames={900}
+        calculateMetadata={calculateMetadata}
+        defaultProps={props}
+      />
+      <Composition
+        id="ReitComposition"
+        component={ReitComposition}
+        fps={FPS}
+        width={1080}
+        height={1920}
+        durationInFrames={900}
+        calculateMetadata={calculateMetadata}
+        defaultProps={props}
+      />
+      <Composition
+        id="ReitsWhatTheyAreComposition"
+        component={ReitsWhatTheyAreComposition}
         fps={FPS}
         width={1080}
         height={1920}

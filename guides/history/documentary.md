@@ -40,6 +40,86 @@ import { BgFlare } from "@yt-shorts/video-renderer";
 <BgFlare frame={frame} startFrame={startFrame} />
 ```
 
+---
+
+## Background Image Priority
+
+Before reaching for a programmatic background, check for static images. Use this priority order:
+
+### Priority 1 — Guide-specific background (`guides/history/bg/`)
+
+Place topic- or category-specific background images here:
+
+```
+guides/history/bg/
+├── default.png         ← general history/documentary feel
+├── wartime.png         ← conflict and war topics
+├── archive.png         ← archival/research topics
+└── <topic-slug>.png    ← one image per specific topic (optional)
+```
+
+In Remotion, static files must live inside `public/`. Before rendering, copy your
+preferred guide image to `public/bg-image.png`:
+
+```bash
+# Example: set the background for this render
+cp guides/history/bg/default.png public/bg-image.png
+```
+
+Then reference it in scene components using Remotion's `staticFile()`:
+
+```tsx
+import { Img, staticFile } from "remotion";
+
+// Inside a scene component — Ken Burns motion via interpolate()
+<Img
+  src={staticFile("bg-image.png")}
+  style={{
+    position: "absolute", inset: 0,
+    width: "100%", height: "100%",
+    objectFit: "cover",
+    filter: "saturate(0.65) brightness(0.45)",
+    transform: `scale(${imgScale})`,         // Ken Burns — never static
+    transformOrigin: "center center",
+  }}
+/>
+```
+
+Apply a dark scrim so text always reads:
+
+```tsx
+{/* Scrim — always on top of the image */}
+<div style={{
+  position: "absolute", inset: 0,
+  background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)",
+}} />
+```
+
+### Priority 2 — Generic fallback (`public/bg-image.png`)
+
+If no guide-specific image exists, `public/bg-image.png` is the catch-all fallback.
+This file is already present in the repository and safe to use immediately.
+Same usage pattern as Priority 1 — identical `<Img>` code.
+
+### Priority 3 — Programmatic background (generated in code)
+
+Use `BgDeepField`, `BgSignal`, or `BgFlare` only when:
+- No static image exists in `guides/<category>/bg/`
+- No `public/bg-image.png` is present or appropriate
+- The scene explicitly benefits from a generated (animated) background
+
+**Decision table:**
+
+| Situation | Background to use |
+|---|---|
+| `guides/history/bg/<topic>.png` exists | Use it (Priority 1) |
+| Only `public/bg-image.png` exists | Use it (Priority 2) |
+| Stat/data scene, no image needed | `BgSignal` (Priority 3) |
+| Hook/reveal, dramatic moment | `BgFlare` (Priority 3) |
+| Everything else | `BgDeepField` (Priority 3) |
+
+**Never** render a static, motionless image — always apply Ken Burns via `interpolate()`.
+
 
 ---
 

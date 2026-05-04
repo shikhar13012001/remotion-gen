@@ -82,17 +82,24 @@ guides/
 ├── history/
 │   ├── documentary.md          ← Timelines, historical events, dates
 │   ├── biography.md             ← Historical figures, personal stories
-│   └── conflict.md              ← Wars, revolutions, violence
+│   ├── conflict.md              ← Wars, revolutions, violence
+│   └── bg/                      ← Static background images for history category
+│       ├── default.png          ← General-purpose history background
+│       ├── wartime.png          ← Conflict/war topics
+│       └── <topic-slug>.png     ← Per-topic override (optional)
 ├── science/
 │   ├── physics.md               ← Forces, matter, energy
 │   ├── biology.md               ← Life, organisms, health
-│   └── space.md                 ← Cosmos, planets, astronomy
+│   ├── space.md                 ← Cosmos, planets, astronomy
+│   └── bg/                      ← Static backgrounds for science category
 ├── finance/
 │   ├── markets.md               ← Trading, stocks, indices
 │   ├── crypto.md                ← Blockchain, digital assets
-│   └── economics.md             ← Systems, policy, inflation
+│   ├── economics.md             ← Systems, policy, inflation
+│   └── bg/                      ← Static backgrounds for finance category
 └── [category]/
-    └── [topic].md               ← Topic-specific guide
+    ├── [topic].md               ← Topic-specific guide
+    └── bg/                      ← Category background images
 ```
 
 Each guide contains:
@@ -101,6 +108,81 @@ Each guide contains:
 * Color accents recommended for that category
 * Animation types that work best for that content
 * Typography and spacing rules specific to the tone
+
+
+---
+
+## Background Image Priority — Follow This Order
+
+Before building a programmatic background in code, check for static images first.
+
+### Priority 1 — Guide-specific image (`guides/<category>/bg/`)
+
+Check if a `.png` exists for the current category:
+
+```
+guides/history/bg/default.png       ← use for any history topic
+guides/history/bg/<topic-slug>.png  ← use for a specific topic override
+```
+
+If an image exists, copy it to `public/bg-image.png` before rendering:
+
+```bash
+cp guides/history/bg/default.png public/bg-image.png
+```
+
+Then reference it in scene components via `staticFile()`:
+
+```tsx
+import { Img, staticFile, interpolate, useCurrentFrame, useVideoConfig } from "remotion";
+
+// Ken Burns — always animate, never static
+const frame = useCurrentFrame();
+const { durationInFrames } = useVideoConfig();
+const imgScale = interpolate(frame, [0, durationInFrames], [1.0, 1.08], { extrapolateRight: "clamp" });
+
+<Img
+  src={staticFile("bg-image.png")}
+  style={{
+    position: "absolute", inset: 0,
+    width: "100%", height: "100%",
+    objectFit: "cover",
+    filter: "saturate(0.65) brightness(0.45)",
+    transform: `scale(${imgScale})`,
+    transformOrigin: "center center",
+  }}
+/>
+
+{/* Always add a scrim so text reads over the image */}
+<div style={{
+  position: "absolute", inset: 0,
+  background: "linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.65) 100%)",
+}} />
+```
+
+### Priority 2 — Generic fallback (`public/bg-image.png`)
+
+If no category-specific image exists, use `public/bg-image.png` directly.
+This file is always present in the repository. Same code as Priority 1.
+
+### Priority 3 — Programmatic background (last resort)
+
+Only use `BgDeepField`, `BgSignal`, or `BgFlare` when:
+- No image exists in `guides/<category>/bg/`
+- `public/bg-image.png` is absent or inappropriate for the scene
+- The scene is data/stat content that benefits from `BgSignal`'s clinical grid
+
+**Decision table:**
+
+| Situation | Background |
+|---|---|
+| `guides/<category>/bg/<slug>.png` exists | Priority 1 — copy → `public/bg-image.png` |
+| Only `public/bg-image.png` available | Priority 2 — use it directly |
+| Stat/data scene (`beat=reveal`, `dataValue!=null`) | Priority 3 — `BgSignal` |
+| Hook/reveal/close, no image available | Priority 3 — `BgFlare` |
+| Narration body, no image available | Priority 3 — `BgDeepField` |
+
+**Rule: never render a static image.** All image backgrounds must use Ken Burns (scale or pan) via `interpolate()`.
 
 
 ---

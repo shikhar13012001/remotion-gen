@@ -24,16 +24,19 @@ const REPAIR_PROMPT =
 const MIN_SENTENCES = 8;
 const MAX_ATTEMPTS  = 3;
 
-function buildUserMessage(rawContent: string, attempt: number, guide?: string): string {
+function buildUserMessage(rawContent: string, attempt: number, guide?: string, design?: string): string {
   const prefix = attempt > 1
     ? `IMPORTANT: Your previous response had too few sentences. ` +
       `You MUST write exactly 10–16 sentences in the sentences array. ` +
       `First sentence beat MUST be "hook". Last sentence beat MUST be "close".\n\n`
     : "";
-  const guideSection = guide
-    ? `CREATIVE GUIDE FOR THIS CATEGORY:\n${"─".repeat(60)}\n${guide}\n${"─".repeat(60)}\n\n`
+  const designSection = design
+    ? `DESIGN SYSTEM:\n${"\u2500".repeat(60)}\n${design}\n${"\u2500".repeat(60)}\n\n`
     : "";
-  return `${guideSection}${prefix}Topic: ${rawContent.trim()}`;
+  const guideSection = guide
+    ? `CREATIVE GUIDE FOR THIS CATEGORY:\n${"\u2500".repeat(60)}\n${guide}\n${"\u2500".repeat(60)}\n\n`
+    : "";
+  return `${designSection}${guideSection}${prefix}Topic: ${rawContent.trim()}`;
 }
 
 function coerceScriptPackage(raw: Record<string, unknown>): ScriptPackage {
@@ -101,9 +104,9 @@ function coerceScriptPackage(raw: Record<string, unknown>): ScriptPackage {
 
 export async function runCall1(
   rawContent: string,
-  opts: { temperature?: number; guide?: string } = {}
+  opts: { temperature?: number; guide?: string; design?: string } = {}
 ): Promise<ScriptPackage> {
-  console.log("\n  ── CALL 1: Script writer ──────────────────────────────");
+  console.log("\n  ── CALL 1: Script writer ──────────────────────────────────────────────────────");
 
   let output: ScriptPackage | null = null;
 
@@ -114,7 +117,7 @@ export async function runCall1(
     try {
       result = await callLMStudioJSON<Record<string, unknown>>(
         PROMPT_CALL1,
-        buildUserMessage(rawContent, attempt, opts.guide),
+        buildUserMessage(rawContent, attempt, opts.guide, opts.design),
         { model, temperature: opts.temperature ?? 0.6, maxTokens: 3000, schema: SCHEMA_A, schemaName: "script_package" }
       );
     } catch (parseErr) {

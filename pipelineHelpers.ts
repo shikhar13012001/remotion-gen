@@ -47,12 +47,12 @@ export function resolveClips(publicDir: string, needed: number, explicitClips?: 
 
 export function parseFlags(): {
   skipAudio: boolean; skipStitch: boolean;
-  voiceId?: string; clips?: string[]; bgMusic?: string; tokensPath?: string; guide?: string;
+  voiceId?: string; clips?: string[]; bgMusic?: string; designPath?: string; guide?: string;
 } {
   const args = process.argv.slice(2);
   const out: {
     skipAudio: boolean; skipStitch: boolean;
-    voiceId?: string; clips?: string[]; bgMusic?: string; tokensPath?: string; guide?: string;
+    voiceId?: string; clips?: string[]; bgMusic?: string; designPath?: string; guide?: string;
   } = { skipAudio: false, skipStitch: false };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--skip-audio")              out.skipAudio   = true;
@@ -60,7 +60,7 @@ export function parseFlags(): {
     if (args[i] === "--voice-id"   && args[i + 1]) out.voiceId   = args[++i];
     if (args[i] === "--clips"      && args[i + 1]) out.clips     = args[++i].split(",");
     if (args[i] === "--bg-music"   && args[i + 1]) out.bgMusic   = args[++i];
-    if (args[i] === "--tokens"     && args[i + 1]) out.tokensPath = args[++i];
+    if (args[i] === "--design"     && args[i + 1]) out.designPath = args[++i];
     if (args[i] === "--guide"      && args[i + 1]) out.guide     = args[++i];
   }
   return out;
