@@ -19,6 +19,7 @@ const OUTPUT_DIR  = path.join(__dirname, "data", "output");
 const PUBLIC_DIR  = path.join(__dirname, "public");
 const AUDIO_NAME  = "voice.mp3";
 const TIMING_NAME = "timing.json";
+const PROMPT_FILE = path.join(__dirname, "data", "output", "claude_prompt.txt");
 
 async function runPipeline(): Promise<void> {
   const { skipAudio, voiceId, tokensPath, guide } = parseFlags();
@@ -81,6 +82,7 @@ async function runPipeline(): Promise<void> {
   // ── HANDOFF ─────────────────────────────────────────────────────────────────
   printHandoff({
     scriptJsonPath,
+    promptFile:    PROMPT_FILE,
     audioPath:     audioFile ? path.join(PUBLIC_DIR, AUDIO_NAME)  : null,
     timingPath:    audioFile ? path.join(PUBLIC_DIR, TIMING_NAME) : null,
     tokensPath:    tokensPath ?? null,
@@ -94,6 +96,7 @@ async function runPipeline(): Promise<void> {
 
 function printHandoff(opts: {
   scriptJsonPath: string;
+  promptFile:     string;
   audioPath:      string | null;
   timingPath:     string | null;
   tokensPath:     string | null;
@@ -104,7 +107,7 @@ function printHandoff(opts: {
   elapsed:        string;
 }): void {
   const {
-    scriptJsonPath, audioPath, timingPath, tokensPath,
+    scriptJsonPath, promptFile, audioPath, timingPath, tokensPath,
     topic, accentColor, sentenceCount, durationSec, elapsed,
   } = opts;
 
@@ -241,8 +244,12 @@ Test    : npx remotion render ShortsComposition out/video.mp4 --props=props.json
 
 ${line}`;
 
+  fs.mkdirSync(path.dirname(promptFile), { recursive: true });
+  fs.writeFileSync(promptFile, prompt.trimStart(), "utf-8");
+
   console.log(prompt);
-  console.log(`  Copy the block above into Claude Code to build the composition.`);
+  console.log(`  Saved   : ${promptFile}`);
+  console.log(`  Copy the block above (or open the file) into Claude Code.`);
   console.log(line + "\n");
 }
 
