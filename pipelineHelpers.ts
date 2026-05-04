@@ -50,6 +50,8 @@ export function parseFlags(): {
   voiceId?: string; clips?: string[]; bgMusic?: string; designPath?: string; guide?: string;
 } {
   const args = process.argv.slice(2);
+  console.debug(`  [DEBUG] process.argv: ${JSON.stringify(process.argv)}`);
+  console.debug(`  [DEBUG] args: ${JSON.stringify(args)}`);
   const out: {
     skipAudio: boolean; skipStitch: boolean;
     voiceId?: string; clips?: string[]; bgMusic?: string; designPath?: string; guide?: string;

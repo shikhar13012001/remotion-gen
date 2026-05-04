@@ -20,6 +20,7 @@ export async function generateAudioStep(
   timingName: string,
   opts: { skipAudio: boolean; voiceId?: string; sentenceTexts?: string[] },
 ): Promise<AudioResult> {
+  console.debug(`  [DEBUG] generateAudioStep: skipAudio=${opts.skipAudio}`);
   if (opts.skipAudio) {
     return { audioFile: "", wordTimings: [], durationSec: 0 };
   }
