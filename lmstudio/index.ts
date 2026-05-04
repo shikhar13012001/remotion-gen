@@ -1,29 +1,22 @@
-export { analyzeAndStructure, generateVideoSpec, videoSpecToMetadata } from "./orchestrate.js";
-export { runCall1b } from "./call1b.js";
+export { generateVideoSpec } from "./orchestrate.js";
 export { TokenMapSchema } from "./types.js";
 export type {
-  // New canonical types
+  // Canonical types
   TokenMap,
   Beat,
   ScriptSentence,
   ScriptPackage,
-  // Call 1b
-  VisualAct,
-  KeyMoment,
-  TemplateBudget,
-  VisualBrief,
-  // Call 2
+  // Scene/directive types
   SceneTemplate,
   TemplateData,
   SentenceVisualDirective,
   VideoSpec,
-  // Legacy types (backward compat)
-  ImageMotion,
+  // Animation types
+  AnimationType,
   AnimationSpec,
+  // Legacy types (kept for backward-compat consumers in src/)
+  ImageMotion,
   SentenceSceneDirective,
   ContentMetadata,
-  AnimationType,
-  SceneIntent,
-  ScriptOutput,
 } from "./types.js";
 export { ANIMATION_TYPES, ACCENT_PALETTE } from "./constants.js";

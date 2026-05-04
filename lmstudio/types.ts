@@ -248,30 +248,3 @@ export type ContentMetadata = {
   accentColor:     string;
   sceneDirectives: SentenceSceneDirective[];
 };
-
-/** @deprecated Use ScriptPackage */
-export interface SceneIntent {
-  sentence_index:  number;
-  scene_template:  "fullbleed" | "text_dominant" | "stat_callout" | "animated_graphic";
-  highlight_words: string[];
-}
-
-/** @deprecated Use ScriptPackage */
-export interface ScriptOutput {
-  hook:          string;
-  body:          string[];
-  cta:           string;
-  title:         string;
-  contentType:   ContentMetadata["contentType"];
-  mood:          ContentMetadata["mood"];
-  pacing:        ContentMetadata["pacing"];
-  visualStyle:   ContentMetadata["visualStyle"];
-  accentColor:   string;
-  scene_intents: SceneIntent[];
-}
-
-/** @deprecated */
-export type SceneGroup = Record<
-  "fullbleed" | "text_dominant" | "stat_callout" | "animated_graphic",
-  SceneIntent[]
->;

@@ -104,7 +104,12 @@ export const ShortsComposition: React.FC<Props> = ({
         {bodyScenes.flatMap((scene, j) => {
           const dur      = bodyDurationFrames[j] ?? 60;
           const offset   = bodyStartFrames[j] ?? bodyStart;
-          const directive = autoFallbackDirective([], j + 1);
+          const baseDirective = autoFallbackDirective([], j + 1);
+          // Enhance directive with highlight words from scene data
+          const directive = {
+            ...baseDirective,
+            highlight_words: scene.highlightWords,
+          };
 
           const els: React.ReactNode[] = [
             <TransitionSeries.Sequence key={`seq-${j}`} durationInFrames={dur}>
@@ -118,6 +123,8 @@ export const ShortsComposition: React.FC<Props> = ({
                 sceneIndex={j}
                 totalScenes={bodyScenes.length}
                 fallbackClip={resolvedImages[j + 1] ?? undefined}
+                sentenceText={scene.text}
+                fontFamily={DISPLAY_FONT}
               />
             </TransitionSeries.Sequence>,
           ];

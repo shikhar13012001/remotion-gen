@@ -20,6 +20,8 @@ export interface SceneRendererProps {
   fallbackClip?:     string;
   /** Sentence text for frame-based word reveal when wordTimings are absent */
   sentenceText?:     string;
+  /** Font family for text rendering */
+  fontFamily?:       string;
 }
 
 // ─── New scene renderer props (new SentenceVisualDirective) ───────────────────
@@ -38,6 +40,7 @@ export interface NewSceneRendererProps {
   totalScenes:       number;
   fallbackClip?:     string;
   sentenceText?:     string;
+  fontFamily?:       string;
 }
 
 // ─── Unified renderer props ────────────────────────────────────────────────────
@@ -57,6 +60,7 @@ export interface UnifiedSceneRendererProps {
   totalScenes:       number;
   fallbackClip?:     string;
   sentenceText?:     string;
+  fontFamily?:       string;
 }
 
 export type SceneRegistryKey = SceneTemplate;

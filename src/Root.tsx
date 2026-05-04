@@ -4,6 +4,7 @@ import {
   ShortsComposition,
   type Props,
 } from "./compositions/ShortsComposition";
+import kennedyScript from "../data/output/script.json";
 
 const FPS = 30;
 
@@ -16,6 +17,51 @@ const calculateMetadata: CalculateMetadataFunction<Props> = async ({ props }) =>
   return { durationInFrames: totalFrames };
 };
 
+/**
+ * Transform script object into Props
+ */
+function scriptToProps(script: {
+  topic: string;
+  total_words: number;
+  accentColor: string;
+  sentences: Array<{
+    index: number;
+    text: string;
+    beat: string;
+    word_count: number;
+    suggested_duration_ms: number;
+    visualQuery: string | null;
+    needsImage: boolean;
+    highlightWords: string[];
+    dataValue: number | null;
+  }>;
+}): Props {
+  const scenes = script.sentences.map((s) => ({
+    text: s.text,
+    highlightWords: s.highlightWords,
+    dataValue: s.dataValue,
+  }));
+
+  const suggestedDurations = script.sentences.map((s) => s.suggested_duration_ms);
+  const resolvedImages = script.sentences.map(() => null);
+
+  const tokens = {
+    fontFamily: "system-ui, sans-serif",
+    colors: { accent: script.accentColor },
+    typography: {},
+    spacing: {},
+    radii: {},
+  };
+
+  return {
+    scenes,
+    sentenceDurations: [],
+    suggestedDurations,
+    resolvedImages,
+    tokens,
+  };
+}
+
 const DEFAULT_TOKENS: Props["tokens"] = {
   fontFamily:  "system-ui, sans-serif",
   colors:      { accent: "#c8a96e" },
@@ -23,6 +69,9 @@ const DEFAULT_TOKENS: Props["tokens"] = {
   spacing:     {},
   radii:       {},
 };
+
+// Use Kennedy script if available, otherwise fallback
+const props = scriptToProps(kennedyScript);
 
 export const Root: React.FC = () => {
   return (
@@ -35,17 +84,7 @@ export const Root: React.FC = () => {
         height={1920}
         durationInFrames={900}
         calculateMetadata={calculateMetadata}
-        defaultProps={{
-          scenes: [
-            { text: "She bleeds where the desert breathes.", highlightWords: ["bleeds"], dataValue: null },
-            { text: "Hidden in the creosote, she twines toward the boiling sun.", highlightWords: ["creosote", "twines"], dataValue: null },
-            { text: "Follow for more dark poetry.", highlightWords: ["poetry"], dataValue: null },
-          ],
-          sentenceDurations:  [],
-          suggestedDurations: [3000, 4000, 3000],
-          resolvedImages:     [null, null, null],
-          tokens:             DEFAULT_TOKENS,
-        } satisfies Props}
+        defaultProps={props}
       />
     </>
   );

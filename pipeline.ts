@@ -1,8 +1,9 @@
-// Pipeline: input.txt → data/output/script.json + public/voice.mp3 + public/timing.json
-// After completion, a Claude Code prompt is printed — paste it to build the Remotion composition.
+// Pipeline: input.txt → data/output/script.json → public/voice.mp3 + timing.json → out/prompt/claude.md
+// Uses guides (./guides/*.md) and design tokens (./designs/**/*.tokens.json)
 //
-// Usage: npm run pipeline [--skip-audio] [--voice-id <id>]
-//        [--tokens ./designs/<file>.tokens.json] [--guide guides/history/documentary.md]
+// Usage: npm run pipeline [--tokens ./designs/<file>.tokens.json] [--guide guides/history/documentary.md]
+//        npm run pipeline --skip-audio          (skip ElevenLabs TTS step)
+//        npm run pipeline --voice-id <id>       (override ElevenLabs voice)
 import * as fs from "fs";
 import * as path from "path";
 import { generateVideoSpec } from "./lmstudio/orchestrate";
@@ -17,22 +18,20 @@ try { require("dotenv").config(); } catch {}
 const INPUT_FILE  = path.join(__dirname, "data", "input", "input.txt");
 const OUTPUT_DIR  = path.join(__dirname, "data", "output");
 const PUBLIC_DIR  = path.join(__dirname, "public");
-const AUDIO_NAME  = "voice.mp3";
-const TIMING_NAME = "timing.json";
-const PROMPT_FILE = path.join(__dirname, "data", "output", "claude_prompt.txt");
+const PROMPT_FILE = path.join(__dirname, "out", "prompt", "claude.md");
 
 async function runPipeline(): Promise<void> {
-  const { skipAudio, voiceId, tokensPath, guide } = parseFlags();
+  const { tokensPath, guide, skipAudio, voiceId } = parseFlags();
   const pipelineStart = Date.now();
 
   console.log("\n╔═════════════════════════════════════════════════════╗");
-  console.log("║       YT Shorts — Script & Audio Pipeline           ║");
+  console.log("║    YT Shorts — Script Generation Pipeline           ║");
   console.log("╚═════════════════════════════════════════════════════╝");
 
-  // ── STEP 0: Load design tokens (optional) ──────────────────────────────────
+  // ── STEP 1: Load design tokens ─────────────────────────────────────────────
   let tokens: TokenMap | undefined;
   if (tokensPath) {
-    stepStart("STEP 0  Load design tokens");
+    stepStart("STEP 1  Load design tokens");
     if (!fs.existsSync(tokensPath)) {
       stepFail(`Tokens file not found: ${tokensPath}`); process.exit(1);
     }
@@ -44,213 +43,128 @@ async function runPipeline(): Promise<void> {
       stepFail(`Tokens validation failed: ${result.error.message}`); process.exit(1);
     }
     tokens = result.data;
-    stepDone("STEP 0  Load design tokens", tokensPath);
+    stepDone("STEP 1  Load design tokens", tokensPath);
   }
 
-  // ── STEP 1: Read input ──────────────────────────────────────────────────────
-  stepStart("STEP 1  Read input.txt");
+  // ── STEP 2: Read input brief ───────────────────────────────────────────────
+  stepStart("STEP 2  Read input.txt");
   if (!fs.existsSync(INPUT_FILE)) {
     stepFail(`input.txt not found: ${INPUT_FILE}`); process.exit(1);
   }
   const rawInput = fs.readFileSync(INPUT_FILE, "utf-8").trim();
   if (!rawInput) { stepFail("input.txt is empty."); process.exit(1); }
-  stepDone("STEP 1  Read input.txt", `${rawInput.split(/\s+/).length} words`);
+  stepDone("STEP 2  Read input.txt", `${rawInput.split(/\s+/).length} words`);
 
-  // ── STEP 2: Script generation ───────────────────────────────────────────────
-  stepStart("STEP 2  LM Studio — script generation");
-  const { videoSpec, savedTo: ttsScriptPath } = await generateVideoSpec(rawInput, {
+  // ── STEP 3: Script generation ──────────────────────────────────────────────
+  stepStart("STEP 3  Generate script");
+  const { videoSpec, savedTo: scriptTxtPath } = await generateVideoSpec(rawInput, {
     outputDir: OUTPUT_DIR,
     guide,
     tokens,
   });
   const scriptJsonPath = path.join(OUTPUT_DIR, "script.json");
-  stepDone("STEP 2  LM Studio", `${videoSpec.sentences.length} sentences → data/output/script.json`);
+  stepDone("STEP 3  Script generation", `${videoSpec.sentences.length} sentences → data/output/script.json`);
 
-  // ── STEP 3: ElevenLabs TTS ──────────────────────────────────────────────────
-  stepStart("STEP 3  ElevenLabs — voice over + word timestamps");
-  const { audioFile, wordTimings, durationSec } = await generateAudioStep(
-    ttsScriptPath, PUBLIC_DIR, AUDIO_NAME, TIMING_NAME,
+  // ── STEP 4: Audio generation (ElevenLabs TTS) ─────────────────────────────
+  stepStart("STEP 4  Generate audio");
+  const audioResult = await generateAudioStep(
+    scriptTxtPath,
+    PUBLIC_DIR,
+    "voice.mp3",
+    "timing.json",
     { skipAudio, voiceId, sentenceTexts: videoSpec.sentences.map(s => s.text) },
   );
-  if (audioFile) {
-    stepDone("STEP 3  ElevenLabs",
-      `${durationSec.toFixed(1)}s · ${wordTimings.length} words · public/${AUDIO_NAME}`);
+  if (audioResult.audioFile) {
+    stepDone("STEP 4  Generate audio", `${audioResult.durationSec.toFixed(1)}s → public/voice.mp3 + timing.json`);
   } else {
-    stepDone("STEP 3  ElevenLabs", "skipped");
+    stepDone("STEP 4  Generate audio", "skipped (no API key or --skip-audio flag)");
   }
 
-  // ── HANDOFF ─────────────────────────────────────────────────────────────────
-  printHandoff({
-    scriptJsonPath,
+  // ── STEP 5: Save handoff prompt ────────────────────────────────────────────
+  stepStart("STEP 5  Save handoff prompt");
+  saveHandoffPrompt({
     promptFile:    PROMPT_FILE,
-    audioPath:     audioFile ? path.join(PUBLIC_DIR, AUDIO_NAME)  : null,
-    timingPath:    audioFile ? path.join(PUBLIC_DIR, TIMING_NAME) : null,
+    scriptJsonPath,
     tokensPath:    tokensPath ?? null,
     topic:         videoSpec.topic,
     accentColor:   videoSpec.accentColor,
     sentenceCount: videoSpec.sentences.length,
-    durationSec,
-    elapsed:       ((Date.now() - pipelineStart) / 1000).toFixed(1),
+    hasAudio:      !!audioResult.audioFile,
   });
+  stepDone("STEP 5  Save handoff prompt", PROMPT_FILE);
+
+  // ── COMPLETION ─────────────────────────────────────────────────────────────
+  console.log(`\n✅ Pipeline complete in ${((Date.now() - pipelineStart) / 1000).toFixed(1)}s`);
+  console.log(`\n📄 Outputs:`);
+  console.log(`   Script  : data/output/script.json`);
+  if (audioResult.audioFile) {
+    console.log(`   Audio   : public/voice.mp3`);
+    console.log(`   Timing  : public/timing.json`);
+  }
+  console.log(`   Prompt  : out/prompt/claude.md`);
+  console.log(`\n▶  Open out/prompt/claude.md and follow the instructions to build the composition.`);
 }
 
-function printHandoff(opts: {
-  scriptJsonPath: string;
+function saveHandoffPrompt(opts: {
   promptFile:     string;
-  audioPath:      string | null;
-  timingPath:     string | null;
+  scriptJsonPath: string;
   tokensPath:     string | null;
   topic:          string;
   accentColor:    string;
   sentenceCount:  number;
-  durationSec:    number;
-  elapsed:        string;
+  hasAudio:       boolean;
 }): void {
-  const {
-    scriptJsonPath, promptFile, audioPath, timingPath, tokensPath,
-    topic, accentColor, sentenceCount, durationSec, elapsed,
-  } = opts;
+  const { promptFile, scriptJsonPath, tokensPath, topic, accentColor, sentenceCount, hasAudio } = opts;
 
-  const line = "═".repeat(64);
-  const dash = "─".repeat(64);
+  const audioSection = hasAudio
+    ? `Audio         : public/voice.mp3\nTiming        : public/timing.json`
+    : `(No audio — run \`npm run gen:audio\` to generate separately)`;
 
-  console.log(`\n  Done in ${elapsed}s`);
-  console.log(line);
-  console.log("\n  ASSETS READY");
-  console.log(`    Script  : ${scriptJsonPath}`);
-  if (audioPath)  console.log(`    Audio   : ${audioPath}`);
-  if (timingPath) console.log(`    Timing  : ${timingPath}`);
-  if (tokensPath) console.log(`    Tokens  : ${tokensPath}`);
+  const prompt = `# Build Remotion Composition from Generated Script
 
-  // ── Font loading guidance ──────────────────────────────────────────────────
-  const fontSection = tokensPath
-    ? `FONT LOADING — CRITICAL
-The tokens file (${tokensPath}) has a \`fontFamily\` CSS string.
-Remotion renders in headless Chromium — custom system fonts do not exist there.
-You MUST pick one approach before writing any text component:
+Topic         : ${topic}
+Script        : ${scriptJsonPath}
+Sentences     : ${sentenceCount}
+Accent Color  : ${accentColor}
+${tokensPath ? `Design Tokens : ${tokensPath}\n` : ""}${audioSection}
 
-  A) Google Fonts (recommended — zero file management):
-       npm install @remotion/google-fonts
-       import { loadFont } from "@remotion/google-fonts/Inter";   // closest match
-       const { waitUntilDone } = loadFont();
-       // call this once at the top of Root.tsx, before any component renders
+## Read the script and use the guides
 
-  B) Local font file (.woff2 or .ttf already on disk):
-       Copy the file to public/fonts/MyFont.woff2
-       import { loadFont } from "@remotion/core";
-       import { staticFile } from "remotion";
-       loadFont({ family: "MyFont", url: staticFile("fonts/MyFont.woff2"), weight: "400" });
+1. Open: guides/history/documentary.md (or the relevant guide for your topic)
+2. Design tokens: ${tokensPath || "designs/**/*.tokens.json"}
+3. Map each sentence to a scene template based on:
+   - beat field (hook, build, turn, reveal, breathe, close)
+   - Content type (narrative, data, rhetorical)
+   - Accent words (render in accent color)
 
-  C) Accepted substitution: document which Google Font you chose and why.
+## Scene templates available (from guide)
 
-Do NOT leave fontFamily as a bare CSS string — Remotion silently falls back to
-system-ui and the design tokens become meaningless in the rendered video.`
-    : `FONTS
-Use @remotion/google-fonts or load .woff2 files via staticFile("fonts/...").
-Do not use bare CSS fontFamily strings — headless Chromium has no custom fonts
-and Remotion will silently fall back to system-ui.`;
+- TplEditorialHeadline  (hook, close, section breaks)
+- TplStatCallout        (numbers, dates, data)
+- TplTimeline           (chronological sequences)
+- TplFlowDiagram        (cause-effect, processes)
+- TplTextDominant       (narration only, no imagery)
+- TplSplitPhotoData     (photo + facts)
+- TplSubjectCutout      (person/subject feature)
+- TplTransitionWipe     (major section breaks)
 
-  // ── Audio / timing section ─────────────────────────────────────────────────
-  const audioSection = audioPath && timingPath
-    ? `Audio file  : ${audioPath}
-Timing JSON : ${timingPath}
+## Build composition
 
-timing.json is an array of WordTiming objects:
-  { word: string; start: number; end: number; sentenceIndex: number }
-sentenceIndex is 0-based and maps each word to its sentence.
-Compute each scene's start time and duration from the first/last word
-in each sentenceIndex group — do not use suggested_duration_ms from the script.`
-    : `Audio and timing were not generated (--skip-audio was set).
-Run the pipeline without --skip-audio to produce public/voice.mp3 and public/timing.json.
-Until then, fall back to sentence.suggested_duration_ms for scene durations.`;
+Use the script metadata (beat, highlightWords, dataValue) to select templates.
+Render with design tokens for colors, typography, spacing.
+No hardcoded values — use TOKEN.* constants from guide.
 
-  const prompt = `
-${line}
-  CLAUDE CODE PROMPT — Build Remotion Composition
-  Copy everything between the lines into Claude Code.
-${line}
+## Output
 
-You are building a Remotion video composition for a YouTube Short.
-Spec: 1080 × 1920 px  ·  30 fps  ·  vertical  ·  no intro logo animation.
-
-TOPIC        : ${topic}
-ACCENT COLOR : ${accentColor}
-SENTENCES    : ${sentenceCount}
-DURATION     : ${durationSec > 0 ? `${durationSec.toFixed(1)}s` : "(generate audio first)"}
-
-${dash}
-INPUT FILES
-${dash}
-Script JSON  : ${scriptJsonPath}
-${audioPath  ? `Audio        : ${audioPath}` : "Audio        : (run pipeline without --skip-audio)"}
-${timingPath ? `Timing JSON  : ${timingPath}` : "Timing JSON  : (run pipeline without --skip-audio)"}${tokensPath ? `\nDesign Tokens: ${tokensPath}` : ""}
-
-${dash}
-AUDIO & TIMING
-${dash}
-${audioSection}
-
-${dash}
-SCRIPT STRUCTURE
-${dash}
-Read ${scriptJsonPath}. Each sentence object has:
-  index               — 1-based scene number
-  text                — narration text for this scene
-  beat                — "hook" | "build" | "turn" | "reveal" | "breathe" | "close"
-  highlightWords      — 1–3 words to render in ${accentColor}, one font-weight heavier
-  dataValue           — number or null; non-null → consider a large animated counter
-  visualQuery         — string or null; use as image search query for photo backgrounds
-  needsImage          — boolean hint; true → this scene benefits from a photo bg
-  suggested_duration_ms — fallback duration when timing.json is unavailable
-
-Beat → visual treatment guide:
-  hook     → bold editorial headline, dark background, large display text
-  build    → standard narration overlay, optional subtle background
-  turn     → high-contrast layout, strong accent emphasis, mild layout shift
-  reveal   → large stat callout if dataValue is set; else bold centered text
-  breathe  → minimal text, maximum negative space, slow pacing
-  close    → center-aligned, smaller text, fade-to-black
-
-${dash}
-${fontSection}
-
-${dash}
-QUALITY REQUIREMENTS
-${dash}
-• Background: #0d0d0d (near-black — never pure #000000)
-• Text: #f0f0f0 (near-white)
-• All animation via Remotion interpolate() / spring() — no CSS transitions, no @keyframes
-• No border-radius > 4px on any element
-• Karaoke: each word highlights as its \`start\` timestamp passes in the audio
-• Include <Audio src={staticFile("${AUDIO_NAME}")} /> in the composition root
-• Scene durations must come from timing.json boundaries, not hardcoded values
-• Register as "ShortsComposition" in src/Root.tsx (width: 1080, height: 1920, fps: 30)
-
-${dash}
-DO NOT
-${dash}
-• No intro logo animation or countdown screen
-• No Inter, Roboto, or Arial as the primary font
-• No hardcoded hex values inside components — use a palette constant or context
-• No CSS animation / transition / @keyframes anywhere
-• No third-party animation libraries (framer-motion, gsap, anime.js, etc.)
-
-${dash}
-OUTPUT
-${dash}
-Produce : src/compositions/GeneratedComposition.tsx
-Update  : src/Root.tsx   (register the composition)
-Test    : npx remotion render ShortsComposition out/video.mp4 --props=props.json
-
-${line}`;
+Create: src/compositions/GeneratedComposition.tsx
+Update: src/Root.tsx (register composition)
+Render: npm run build
+`;
 
   fs.mkdirSync(path.dirname(promptFile), { recursive: true });
-  fs.writeFileSync(promptFile, prompt.trimStart(), "utf-8");
+  fs.writeFileSync(promptFile, prompt, "utf-8");
 
-  console.log(prompt);
-  console.log(`  Saved   : ${promptFile}`);
-  console.log(`  Copy the block above (or open the file) into Claude Code.`);
-  console.log(line + "\n");
+  console.log(`\n✅ Handoff prompt saved: ${promptFile}`);
 }
 
 runPipeline().catch((err) => {

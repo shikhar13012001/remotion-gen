@@ -45,9 +45,14 @@ const BgImageKenBurns: React.FC<{
   );
 };
 
-export const FullbleedScene: React.FC<SceneRendererProps> = ({
+interface FullbleedScenePropsExtended extends SceneRendererProps {
+  fontFamily?: string;
+}
+
+export const FullbleedScene: React.FC<FullbleedScenePropsExtended> = ({
   directive, sentenceIndex, wordTimings, theme, pacing, styleConf,
   accent, globalFrameOffset, durationInFrames, sceneIndex, totalScenes, fallbackClip, sentenceText,
+  fontFamily,
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -86,6 +91,7 @@ export const FullbleedScene: React.FC<SceneRendererProps> = ({
         accent={accent} position="bottom"
         highlightWords={highlightWords}
         sentenceText={sentenceText}
+        fontFamily={fontFamily}
       />
 
       <ProgressDots total={totalScenes} active={sceneIndex} frame={frame} />

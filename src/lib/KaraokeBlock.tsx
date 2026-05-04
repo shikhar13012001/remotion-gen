@@ -35,12 +35,14 @@ export interface KaraokeBlockProps {
   highlightWords?: string[];
   /** Fallback sentence text for frame-based reveal when wordTimings are absent */
   sentenceText?: string;
+  /** Font family for fallback text rendering */
+  fontFamily?: string;
 }
 
 export const KaraokeBlock: React.FC<KaraokeBlockProps> = ({
   wordTimings, activeSentenceIdx, activeWordIdx, sentenceStartFrame,
   globalFrameOffset, accent, pacing, position = "bottom", fontSize: fontSizeOverride, highlightWords,
-  sentenceText,
+  sentenceText, fontFamily = "Georgia, 'Times New Roman', serif",
 }) => {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
@@ -97,7 +99,7 @@ export const KaraokeBlock: React.FC<KaraokeBlockProps> = ({
             <div key={i} style={{ overflow: "hidden" }}>
               <span style={{
                 display: "inline-block",
-                fontFamily: "Georgia, 'Times New Roman', serif",
+                fontFamily: fontFamily,
                 fontSize: fallbackFontSize,
                 fontWeight: isHighlighted ? 800 : 700,
                 color: isHighlighted ? accent : "#f0f0f0",
