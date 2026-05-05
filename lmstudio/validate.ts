@@ -1,6 +1,7 @@
 // ─── Validation helpers for Call 2 output ─────────────────────────────────────
 
-import type { ScriptPackage, SentenceVisualDirective, TemplateData } from "./types.js";
+import type { ScriptPackage, SentenceVisualDirective, TemplateData } from "./types";
+import { isValidVisualQuery } from "./visualQuery";
 
 const STOPWORDS = new Set([
   "the", "a", "an", "is", "was", "were", "in", "on", "at", "to",
@@ -25,10 +26,9 @@ export function validateAccentWords(words: string[], sentenceText: string): stri
   return best.length > 0 ? [best[0]] : [tokens[0] ?? ""];
 }
 
-/** Returns false if image_query is too generic (fewer than 5 words). */
+/** Returns false if image_query is not a compact 3-4 word visual search query. */
 export function validateImageQuery(query: string | undefined): boolean {
-  if (!query) return false;
-  return query.trim().split(/\s+/).length >= 5;
+  return isValidVisualQuery(query);
 }
 
 /** Build a safe text_dominant directive when a sentence fails Zod validation. */

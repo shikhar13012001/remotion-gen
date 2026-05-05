@@ -1,11 +1,11 @@
 import * as fs from "fs";
 import * as path from "path";
-import { runCall1 } from "./call1.js";
-import { logVideoSpecSummary } from "../trace.js";
+import { runCall1 } from "./call1";
+import { logVideoSpecSummary } from "../trace";
 import type {
   VideoSpec,
   ScriptPackage,
-} from "./types.js";
+} from "./types";
 
 function timer(): () => string {
   const t = Date.now();

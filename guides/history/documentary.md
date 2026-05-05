@@ -4,7 +4,6 @@
 
 Dark, editorial, precise. Every frame teaches something.
 The feeling: classified documents being declassified in real time.
-Reference: LEMMiNO. Not social media. Not a vlog.
 
 When someone watches this, they should feel like they're reading a well-researched article that moves. The typography does the work. The backgrounds are atmosphere, not decoration. Every word earns its frame.
 

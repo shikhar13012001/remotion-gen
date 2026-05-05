@@ -1,5 +1,5 @@
 import React from "react";
-import { interpolate, staticFile, useCurrentFrame } from "remotion";
+import { Img, interpolate, staticFile, useCurrentFrame } from "remotion";
 import { Easing } from "remotion";
 import { Video } from "remotion";
 import type { ImageMotion } from "../../lmstudio/index";
@@ -27,17 +27,27 @@ export const VideoBackground: React.FC<VideoBackgroundProps> = ({
   else if (imageMotion === "pan_right")     transform = `translateX(${interpolate(progress, [0, 1], [-4, 0])}%) scale(1.05)`;
   else                                      transform = "scale(1.02)";
 
+  const isVideo = /\.(mp4|webm|mov|m4v)$/i.test(clip);
+  const mediaStyle: React.CSSProperties = {
+    position: "absolute", inset: 0, width: "100%", height: "100%",
+    objectFit: "cover", transform, filter: "saturate(0.75)",
+  };
+
   return (
     <>
-      <Video
-        src={staticFile(clip)}
-        style={{
-          position: "absolute", inset: 0, width: "100%", height: "100%",
-          objectFit: "cover", transform, filter: "saturate(0.75)",
-        }}
-        muted
-        loop
-      />
+      {isVideo ? (
+        <Video
+          src={staticFile(clip)}
+          style={mediaStyle}
+          muted
+          loop
+        />
+      ) : (
+        <Img
+          src={staticFile(clip)}
+          style={mediaStyle}
+        />
+      )}
       <div style={{ position: "absolute", inset: 0, background: `rgba(0,0,0,${scrimOpacity})` }} />
     </>
   );

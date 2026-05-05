@@ -1,22 +1,25 @@
 import { Composition } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
+import type { Props } from "./compositions/ShortsComposition";
 import {
-  ShortsComposition,
-  type Props,
-} from "./compositions/ShortsComposition";
-import { ReitComposition } from "./compositions/reits-guide";
-import { ReitsWhatTheyAreComposition } from "./compositions/reits-what-they-are/index";
-import { TheBeginnersGuideToComposition } from "./compositions/the-beginners-guide-to/index";
-import kennedyScript from "../data/output/script.json";
+  ModelContextProtocolComposition,
+  TRANSITION_FRAMES,
+} from "./compositions/model-context-protocol/index";
+import script from "../data/output/script.json";
+import designTokensData from "../data/output/design_tokens.json";
+import imageManifestData from "../data/output/image_manifest.json";
+import type { ImageManifest } from "./utils/imageManifest";
+import { resolveImagesForSentenceCount } from "./utils/imageManifest";
 
 const FPS = 30;
-
 const calculateMetadata: CalculateMetadataFunction<Props> = async ({ props }) => {
   const durations = props.sentenceDurations.length === props.scenes.length
     ? props.sentenceDurations
     : props.suggestedDurations;
   const totalMs     = durations.reduce((a, b) => a + b, 0);
-  const totalFrames = totalMs > 0 ? Math.round((totalMs / 1000) * FPS) : 900;
+  const rawFrames = totalMs > 0 ? Math.round((totalMs / 1000) * FPS) : 900;
+  const transitionOverlap = Math.max(0, props.scenes.length - 1) * TRANSITION_FRAMES;
+  const totalFrames = Math.max(1, rawFrames - transitionOverlap);
   return { durationInFrames: totalFrames };
 };
 
@@ -46,14 +49,34 @@ function scriptToProps(script: {
   }));
 
   const suggestedDurations = script.sentences.map((s) => s.suggested_duration_ms);
-  const resolvedImages = script.sentences.map(() => null);
+  const resolvedImages = resolveImagesForSentenceCount(
+    script.sentences.length,
+    imageManifestData as ImageManifest,
+  );
+
+  const dt = designTokensData as {
+    fontDisplay?: string; fontBody?: string;
+    background?: string; surface?: string;
+    textOn?: string; textMuted?: string; border?: string;
+    accent?: string;
+    brandColors?: Record<string, string>;
+  };
 
   const tokens = {
-    fontFamily: "system-ui, sans-serif",
-    colors: { accent: script.accentColor },
+    fontFamily: dt.fontDisplay ?? "system-ui, sans-serif",
+    colors: {
+      accent:      dt.accent      ?? script.accentColor,
+      background:  dt.background  ?? "#0d0d0d",
+      surface:     dt.surface     ?? "#1a1a1a",
+      textOn:      dt.textOn      ?? "#f0f0f0",
+      textMuted:   dt.textMuted   ?? "rgba(255,255,255,0.55)",
+      border:      dt.border      ?? "rgba(255,255,255,0.08)",
+      fontDisplay: dt.fontDisplay ?? "",
+      fontBody:    dt.fontBody    ?? "",
+    },
     typography: {},
-    spacing: {},
-    radii: {},
+    spacing:    {},
+    radii:      {},
   };
 
   return {
@@ -65,53 +88,15 @@ function scriptToProps(script: {
   };
 }
 
-const DEFAULT_TOKENS: Props["tokens"] = {
-  fontFamily:  "system-ui, sans-serif",
-  colors:      { accent: "#c8a96e" },
-  typography:  {},
-  spacing:     {},
-  radii:       {},
-};
-
-// Use Kennedy script if available, otherwise fallback
-const props = scriptToProps(kennedyScript);
+const props = scriptToProps(script);
 
 export const Root: React.FC = () => {
   return (
     <>
+      
       <Composition
-        id="ShortsComposition"
-        component={ShortsComposition}
-        fps={FPS}
-        width={1080}
-        height={1920}
-        durationInFrames={900}
-        calculateMetadata={calculateMetadata}
-        defaultProps={props}
-      />
-      <Composition
-        id="ReitComposition"
-        component={ReitComposition}
-        fps={FPS}
-        width={1080}
-        height={1920}
-        durationInFrames={900}
-        calculateMetadata={calculateMetadata}
-        defaultProps={props}
-      />
-      <Composition
-        id="ReitsWhatTheyAreComposition"
-        component={ReitsWhatTheyAreComposition}
-        fps={FPS}
-        width={1080}
-        height={1920}
-        durationInFrames={900}
-        calculateMetadata={calculateMetadata}
-        defaultProps={props}
-      />
-      <Composition
-        id="TheBeginnersGuideToComposition"
-        component={TheBeginnersGuideToComposition}
+        id="ModelContextProtocolComposition"
+        component={ModelContextProtocolComposition}
         fps={FPS}
         width={1080}
         height={1920}

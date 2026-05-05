@@ -28,7 +28,7 @@ export interface ScriptSentence {
   beat:                  Beat;
   word_count:            number;
   suggested_duration_ms: number;
-  /** Specific image search query for fullbleed/subject scenes; null for breathe, close, or data-only sentences. */
+  /** Compact 3-4 word Pinterest-friendly image query for fullbleed/subject scenes; null for breathe, close, or data-only sentences. */
   visualQuery:           string | null;
   /** True when this sentence would benefit from a photographic background. */
   needsImage:            boolean;
@@ -196,7 +196,7 @@ export interface VideoSpec {
 
 // ─── Animation type (legacy — kept for registry compatibility) ────────────────
 
-import type { ANIMATION_TYPES } from "./constants.js";
+import type { ANIMATION_TYPES } from "./constants";
 export type AnimationType = typeof ANIMATION_TYPES[number];
 
 // ─── LM Studio caller options ─────────────────────────────────────────────────

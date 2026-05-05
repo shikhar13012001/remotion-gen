@@ -1,6 +1,5 @@
 import * as fs from "fs";
 import * as path from "path";
-import { spawnSync } from "child_process";
 
 export { remotionRender, stitchAudio, logPipelineSummary } from "./pipelineOutput";
 
@@ -47,18 +46,19 @@ export function resolveClips(publicDir: string, needed: number, explicitClips?: 
 
 export function parseFlags(): {
   skipAudio: boolean; skipStitch: boolean;
+  skipImages: boolean;
   voiceId?: string; clips?: string[]; bgMusic?: string; designPath?: string; guide?: string;
 } {
   const args = process.argv.slice(2);
-  console.debug(`  [DEBUG] process.argv: ${JSON.stringify(process.argv)}`);
-  console.debug(`  [DEBUG] args: ${JSON.stringify(args)}`);
   const out: {
     skipAudio: boolean; skipStitch: boolean;
+    skipImages: boolean;
     voiceId?: string; clips?: string[]; bgMusic?: string; designPath?: string; guide?: string;
-  } = { skipAudio: false, skipStitch: false };
+  } = { skipAudio: false, skipStitch: false, skipImages: false };
   for (let i = 0; i < args.length; i++) {
     if (args[i] === "--skip-audio")              out.skipAudio   = true;
     if (args[i] === "--skip-stitch")             out.skipStitch  = true;
+    if (args[i] === "--skip-images")             out.skipImages  = true;
     if (args[i] === "--voice-id"   && args[i + 1]) out.voiceId   = args[++i];
     if (args[i] === "--clips"      && args[i + 1]) out.clips     = args[++i].split(",");
     if (args[i] === "--bg-music"   && args[i + 1]) out.bgMusic   = args[++i];
@@ -74,4 +74,3 @@ export function estimateFrames(allText: string): number {
   const sec   = Math.ceil((words / 130) * 60);
   return Math.min(Math.max(sec * 30, 600), 2700);
 }
-

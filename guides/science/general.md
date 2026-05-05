@@ -209,5 +209,3 @@ For a 10–18 sentence science video:
 * At least 1 `TplFlowDiagram` — explain a mechanism, not just a fact
 * At least 2 `TplTextDominant` for breathing room at scale shifts
 * No more than 3 consecutive `TplEditorialHeadline` or narration scenes
-
-

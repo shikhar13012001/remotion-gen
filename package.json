@@ -8,8 +8,11 @@
   "scripts": {
     "storybook": "npm run storybook --workspace=packages/storybook",
     "start": "remotion studio",
-    "build": "remotion render ShortsComposition out/video.mp4",
-    "pipeline": "npx tsx pipeline.ts",
+    "build": "remotion render IntroducingTheModelContextComposition out/video.mp4",
+    "pipeline": "ts-node pipeline.ts",
+    "regen-prompt": "ts-node scripts/regen-prompt.ts",
+    "check:design": "ts-node scripts/check-design-extractor.ts",
+    "images:test": "ts-node scripts/test-image-resolver.ts",
     "audio:generate": "npx tsx elevenlabs/workflow.ts generate",
     "audio:stitch": "npx tsx elevenlabs/workflow.ts stitch",
     "extract-tokens": "npx tsx scripts/extract-tokens.ts",
@@ -38,6 +41,7 @@
     "@types/react-dom": "^18.2.0",
     "@types/topojson-client": "^3.1.5",
     "@types/topojson-specification": "^1.0.5",
+    "playwright": "^1.55.0",
     "ts-node": "^10.9.0",
     "typescript": "^5.3.0"
   },

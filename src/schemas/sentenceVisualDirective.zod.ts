@@ -13,7 +13,7 @@ const EditorialHeadlineDataSchema = z.object({
 
 const SubjectCutoutDataSchema = z.object({
   type:        z.literal("subject_cutout"),
-  image_query: z.string().min(5),
+  image_query: z.string().min(3),
   annotation:  z.string().optional(),
 });
 
@@ -28,7 +28,7 @@ const StatCalloutDataSchema = z.object({
 
 const SplitPhotoDataSchema = z.object({
   type:        z.literal("split_photo_data"),
-  image_query: z.string().min(5),
+  image_query: z.string().min(3),
   headline:    z.string(),
   facts:       z.array(z.string()).min(1).max(5),
 });
@@ -67,7 +67,7 @@ const TextDominantDataSchema = z.object({
 
 const FullbleedDataSchema = z.object({
   type:         z.literal("fullbleed"),
-  image_query:  z.string().min(5),
+  image_query:  z.string().min(3),
   image_motion: z.enum(["slow_zoom_in", "slow_zoom_out", "pan_left", "pan_right", "static"]),
 });
 

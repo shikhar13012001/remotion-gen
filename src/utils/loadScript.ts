@@ -1,6 +1,8 @@
 import * as fs from "fs";
 import * as path from "path";
 import type { Props } from "../compositions/ShortsComposition";
+import type { ImageManifest } from "./imageManifest";
+import { resolveImagesForSentenceCount } from "./imageManifest";
 
 interface ScriptSentence {
   index: number;
@@ -21,6 +23,12 @@ interface LoadedScript {
   sentences: ScriptSentence[];
 }
 
+function loadImageManifest(scriptPath: string): ImageManifest | null {
+  const manifestPath = path.join(path.dirname(scriptPath), "image_manifest.json");
+  if (!fs.existsSync(manifestPath)) return null;
+  return JSON.parse(fs.readFileSync(manifestPath, "utf-8")) as ImageManifest;
+}
+
 /**
  * Load script.json and transform it into Props for ShortsComposition
  */
@@ -36,8 +44,8 @@ export function loadScriptAsProps(scriptPath: string): Props {
 
   const suggestedDurations = script.sentences.map((s) => s.suggested_duration_ms);
 
-  // No actual images resolved yet (--skip-audio was set)
-  const resolvedImages = script.sentences.map(() => null);
+  const manifest = loadImageManifest(scriptPath);
+  const resolvedImages = resolveImagesForSentenceCount(script.sentences.length, manifest);
 
   // Default tokens with the script's accent color
   const tokens = {

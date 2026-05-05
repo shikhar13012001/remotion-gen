@@ -1,244 +1,239 @@
-# YT Shorts Generation Workflow
+# Video Render Workflow
 
-This pipeline is **intentionally separated into independent stages**:
-
-
-1. **Script Generation** (via LLM)
-2. **Video Rendering** (via Remotion)
-3. **Audio Generation** (via ElevenLabs) — *optional, separate workflow*
-4. **Audio Stitching** (via ffmpeg) — *optional, separate workflow*
+End-to-end flow: topic brief → published MP4.
 
 
 ---
 
-## Stage 1: Script Generation
+## Overview
 
-**Input**: Topic brief in `data/input/input.txt`
+```
+input.txt
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  npm run pipeline                                           │
+│                                                             │
+│  Step 1 · Load design system + guide                        │
+│  Step 2 · Read input.txt                                    │
+│  Step 3 · Generate script (LLM Call 1 → script.json)       │
+│  Step 4 · Generate audio (ElevenLabs, optional)             │
+│  Step 5 · Extract design tokens → design_block.txt         │
+│  Step 6 · Art direction (LLM Call 2 → art_direction.md)    │
+│  Step 7 · Save handoff prompt → out/prompt/claude.md        │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+Build composition (Claude agent reads out/prompt/claude.md)
+    │
+    ├── Read data/output/script.json
+    ├── Read data/output/art_direction.md
+    ├── Read data/output/design_block.txt
+    └── Read guide file (path listed in prompt)
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  npm run start                (Remotion Studio preview)     │
+│  npm run build                (render silent video)         │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+out/video.mp4  (silent)
+    │
+    ├── npm run audio:generate  (ElevenLabs TTS → voice.mp3)
+    │
+    ▼
+┌─────────────────────────────────────────────────────────────┐
+│  npm run audio:stitch         (ffmpeg merge)                │
+└─────────────────────────────────────────────────────────────┘
+    │
+    ▼
+out/video_with_audio.mp4  ✓ done
+```
 
-**Command**:
+
+---
+
+## Step 1 — Write a topic brief
+
+Edit `data/input/input.txt`. One plain-English paragraph describing the topic, tone, and
+any key facts you want covered.
+
+```
+The Tunguska Event, 1908. A massive explosion over Siberia flattened 2000 km² of forest.
+No crater. No meteorite. Eyewitnesses 60 km away were knocked off their feet.
+Scientists still debate what actually hit.
+```
+
+
+---
+
+## Step 2 — Run the pipeline
 
 ```bash
-npm run pipeline [--guide guides/history/documentary.md] [--tokens designs/claude/claude.tokens.json]
+npm run pipeline -- --design designs/vercel/DESIGN.md --guide guides/history/documentary.md --skip-audio
 ```
 
-**Output**:
-
-* `data/output/script.json` — 19 sentences with metadata (beat, highlightWords, dataValue)
-* `data/output/claude_prompt.txt` — Handoff guide for composition building
-
-**What it does**:
-
-* Reads guide and design tokens (if provided)
-* Generates script using LLM
-* Saves handoff prompt to file (NOT console)
-
-**Example**:
-
-```bash
-npm run pipeline --guide guides/history/documentary.md --tokens designs/claude/claude.tokens.json
-```
-
-
----
-
-## Stage 2: Video Rendering
-
-**Input**: Generated script in `data/output/script.json`
-
-**Command**:
-
-```bash
-npm run start          # Preview in dev studio (http://localhost:3000)
-npm run build          # Render to MP4
-```
-
-**Output**:
-
-* `out/video.mp4` — Silent video (no audio track)
-
-**What it does**:
-
-* Loads script.json via Root.tsx
-* Routes sentences to scene templates (HookScene, BodyScenes, CTAScene)
-* Applies design tokens for styling
-* Renders 1080×1920 vertical video at 30fps
-
-**Design-Driven**:
-The composition respects the design guide (`guides/history/documentary.md`) for:
-
-* Scene templates (TplEditorialHeadline, TplStatCallout, etc.)
-* Typography (serif display, sans body, mono code)
-* Colors (from `designs/claude/claude.tokens.json`)
-* Motion & animation (prog/lerp functions, easing curves)
-
-
----
-
-## Stage 3: Audio Generation (Optional)
-
-**Input**: Generated script in `data/output/script.json`
-
-**Command**:
-
-```bash
-npm run audio:generate [--voice-id <eleven-labs-voice-id>]
-```
-
-**Output**:
-
-* `public/voice.mp3` — Full narration audio
-* `public/timing.json` — Word-level timestamps (start/end per word)
-
-**What it does**:
-
-* Reads sentences from script.json
-* Calls ElevenLabs API (requires `ELEVEN_LABS_API_KEY`)
-* Generates per-word timing data for karaoke sync
-
-**Note**: This step is entirely optional. The video renders correctly without it.
-
-
----
-
-## Stage 4: Audio Stitching (Optional)
-
-**Input**:
-
-* `out/video.mp4` (silent video from Stage 2)
-* `public/voice.mp3` (audio from Stage 3)
-
-**Command**:
-
-```bash
-npm run audio:stitch
-```
-
-**Output**:
-
-* `out/video_with_audio.mp4` — Final video with audio track
-
-**What it does**:
-
-* Uses ffmpeg to combine video + audio
-* Copies video codec (no re-encoding)
-* Encodes audio as AAC
-* Outputs publication-ready MP4
-
-
----
-
-## Quick Start
-
-### Just render a silent video:
-
-```bash
-npm run pipeline --guide guides/history/documentary.md --tokens designs/claude/claude.tokens.json
-npm run start          # Preview
-npm run build          # Render
-# → out/video.mp4
-```
-
-### Render + add audio:
-
-```bash
-npm run pipeline --guide guides/history/documentary.md --tokens designs/claude/claude.tokens.json
-npm run build
-npm run audio:generate --voice-id <voice-id>
-npm run audio:stitch
-# → out/video_with_audio.mp4
-```
-
-
----
-
-## Key Design Decisions
-
-### Why separate?
-
-
-1. **Audio is optional** — Many videos are better without narration or use different workflows
-2. **Independence** — Each stage can fail/retry without affecting others
-3. **Flexibility** — Reuse the same script + video with different audio (multiple languages, re-record)
-4. **Clarity** — Clear responsibilities for each tool (LLM → Remotion → ElevenLabs → ffmpeg)
-
-### Handoff is in a file, not console
-
-* **Old**: Printed prompt to terminal (hard to copy, lost on scroll)
-* **New**: Saved to `data/output/claude_prompt.txt` (persistent, easy to reference)
-
-The prompt contains:
-
-* What script was generated
-* Where design tokens came from
-* Scene templates available from the guide
-* How to build the composition
-
-### Design tokens drive styling
-
-Rather than hardcoding colors/fonts/spacing in the composition:
-
-* Load tokens from `designs/claude/claude.tokens.json`
-* Use TOKEN.\* constants (TOKEN.gold, TOKEN.sans, TOKEN.spacing.xl)
-* Switch designs by changing the tokens file
-
-
----
-
-## Environment Variables
-
-Create a `.env` file (or set these in your shell):
-
-```env
-ELEVEN_LABS_API_KEY=sk-...
-LM_STUDIO_BASE_URL=http://localhost:1234/v1
-```
-
-
----
-
-## Files Reference
-
-| File | Purpose |
+| Flag | Required | Purpose |
+|----|----|----|
+| `--design <path>` | Optional | DESIGN.md to extract color/font tokens from. Defaults to the neutral built-in token set. |
+| `--guide <path>` | Optional | Category guide (backgrounds, typography, component list). |
+| `--skip-audio` | Optional | Skip ElevenLabs call. Always use during composition development. |
+| `--voice-id <id>` | Optional | ElevenLabs voice ID. Only needed when generating audio. |
+
+**What gets written:**
+
+| File | Contents |
 |----|----|
-| `pipeline.ts` | Script generation only |
-| `audio-workflow.ts` | Audio generation + stitching |
-| `src/Root.tsx` | Loads script.json, registers composition |
-| `guides/history/documentary.md` | Design system & scene templates |
-| `designs/claude/claude.tokens.json` | Design tokens (colors, typography, spacing) |
-| `data/output/script.json` | Generated script (19 sentences with metadata) |
-| `data/output/claude_prompt.txt` | Handoff guide for composition builder |
-| `public/voice.mp3` | Generated narration (optional) |
-| `public/timing.json` | Word-level timestamps (optional) |
-| `out/video.mp4` | Rendered silent video |
-| `out/video_with_audio.mp4` | Final video with audio (optional) |
+| `data/output/script.json` | Script — sentences, beat tags, highlightWords, dataValues |
+| `data/output/art_direction.md` | Per-scene visual direction from the art director LLM |
+| `data/output/design_block.txt` | `const DESIGN = {...} as const` ready to paste into scene files |
+| `data/output/design_tokens.json` | Design tokens for Root.tsx at render time |
+| `out/prompt/claude.md` | Composition brief for the coding agent |
 
 
 ---
 
-## Troubleshooting
+## Step 3 — Build the composition
 
-**Q: Script generation fails**
+Open `out/prompt/claude.md`. It contains the task brief with file paths to read — not embedded content.
+The coding agent reads:
 
-* Check `data/input/input.txt` exists and is not empty
-* Verify LM Studio is running (http://localhost:1234)
-* Check `.env` has required API keys
+* `data/output/script.json` — to understand each sentence's beat, text, highlightWords
+* `data/output/art_direction.md` — to understand the per-scene layout and animation intent
+* `data/output/design_block.txt` — to get the `const DESIGN` block to paste into every file
+* The guide file (path listed in the prompt) — for available background components and typography
 
-**Q: Video renders but looks wrong**
+The agent creates:
 
-* Review `guides/history/documentary.md` scene templates
-* Verify `designs/claude/claude.tokens.json` colors/fonts are correct
-* Check console for Remotion errors
+```
+src/
+├── compositions/<slug>/
+│   ├── index.ts
+│   └── <VideoName>Composition.tsx
+└── scenes/<slug>/
+    ├── index.ts
+    └── [one file per distinct scene layout]
+```
 
-**Q: Audio generation fails**
+Then registers the composition in `src/Root.tsx`.
 
-* Verify `ELEVEN_LABS_API_KEY` is set
-* Check internet connection
-* Ensure script.json exists
 
-**Q: Audio stitching fails**
+---
 
-* Verify `out/video.mp4` exists (run `npm run build`)
-* Verify `public/voice.mp3` exists (run `npm run audio:generate`)
-* Ensure ffmpeg is installed: `ffmpeg -version`
+## Step 4 — Preview
 
+```bash
+npm run start
+```
+
+Opens Remotion Studio at `http://localhost:3000`. Scrub through every scene.
+Check text legibility, highlight word timing, background treatment, animation feel.
+
+
+---
+
+## Step 5 — Render silent video
+
+```bash
+npm run build
+```
+
+Outputs `out/video.mp4`. 1080×1920, 30fps, no audio track.
+
+To render a specific composition by name:
+
+```bash
+npx remotion render <VideoName>Composition out/video.mp4
+```
+
+
+---
+
+## Step 6 — Generate audio (optional)
+
+Requires `ELEVENLABS_API_KEY` in your `.env`.
+
+```bash
+npm run audio:generate
+# or with a specific voice:
+npm run audio:generate -- --voice-id <voice-id>
+```
+
+Outputs:
+
+* `public/voice.mp3` — full narration
+* `public/timing.json` — word-level timestamps for karaoke sync
+
+
+---
+
+## Step 7 — Stitch audio
+
+```bash
+npm run audio:stitch
+```
+
+Combines `out/video.mp4` + `public/voice.mp3` → `out/video_with_audio.mp4` using ffmpeg.
+Video codec is copied (no re-encode). Audio is encoded as AAC.
+
+
+---
+
+## Rebuild the prompt without re-running the pipeline
+
+If you change the guide file or want to refresh `out/prompt/claude.md` without re-running LLM calls:
+
+```bash
+npm run regen-prompt -- designs/vercel/DESIGN.md guides/finance/general.md
+```
+
+Reads existing `data/output/script.json` and `data/output/art_direction.md`.
+Accepts positional args (design path first, guide path second) or named flags.
+
+
+---
+
+## Available designs
+
+```
+designs/vercel/DESIGN.md    — dark navy, Geist/Inter, clean
+designs/claude/DESIGN.md    — warm dark, editorial
+designs/clay/DESIGN.md      — canvas-white, rounded, vibrant cards
+```
+
+## Available guides
+
+```
+guides/history/documentary.md    — archival tone, image-first when assets exist, diagram surfaces for timelines/mechanisms
+guides/finance/general.md        — BgSignal default, clinical/cold
+guides/science/general.md        — BgSignal default, precise/data-driven
+```
+
+
+---
+
+## Full run (from scratch)
+
+```bash
+# 1. Write brief
+echo "Your topic here" > data/input/input.txt
+
+# 2. Pipeline (skip audio for now)
+npm run pipeline -- --design designs/vercel/DESIGN.md --guide guides/history/documentary.md --skip-audio
+
+# 3. Build the composition (agent step — read out/prompt/claude.md)
+
+# 4. Preview
+npm run start
+
+# 5. Render
+npm run build
+
+# 6. Audio (when ready)
+npm run audio:generate
+npm run audio:stitch
+
+# Final output: out/video_with_audio.mp4
+```
 

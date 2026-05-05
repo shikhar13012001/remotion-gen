@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "outDir": "dist"
   },
-  "include": ["src/**/*", "elevenlabs/**/*", "lmstudio/**/*", "scripts/**/*", "pipeline.ts", "pipelineHelpers.ts", "pipelineAudio.ts", "pipelineOutput.ts", "remotion.config.ts"],
+  "include": ["src/**/*", "elevenlabs/**/*", "lmstudio/**/*", "scripts/**/*", "pipeline.ts", "pipelineHelpers.ts", "pipelineImages.ts", "pipelineAudio.ts", "pipelineOutput.ts", "remotion.config.ts"],
   "ts-node": {
     "compilerOptions": {
       "module": "CommonJS",

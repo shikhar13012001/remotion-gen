@@ -1,6 +1,6 @@
 import OpenAI from "openai";
-import { TEXT_CLEAN_PREFIX } from "./constants.js";
-import type { LMCallOptions } from "./types.js";
+import { TEXT_CLEAN_PREFIX } from "./constants";
+import type { LMCallOptions } from "./types";
 import * as dotenv from "dotenv";
 
 try { dotenv.config(); } catch {}

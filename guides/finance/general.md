@@ -2,171 +2,155 @@
 
 ## Identity
 
-Cold, precise, consequential. The feeling of a trading floor at the edge of collapse.
-Reference: Bloomberg documentary + LEMMiNO. Not a how-to guide. Not news.
+Precise, mechanical, and consequential. Finance videos should feel like opening
+a machine and watching money, risk, time, and incentives move through it.
 
-Every number is a verdict. Every chart tells a story of winners and losers.
-The tone is unsparing: state what happened, let the viewer feel the weight.
+The goal is not a generic dark documentary mood. The goal is explanation through
+designed systems: ledgers, thresholds, flows, comparison bars, balance-sheet
+panels, rate dials, ownership maps, and diagnostic dashboards.
 
-Accent color: `#f0c040` — amber gold. Money, warning, urgency.
+Accent color: `#f0c040` - amber gold. Use it for money paths, warning thresholds,
+active values, and the single most important figure in a scene.
+
+Never imitate any named creator, YouTube channel, or documentary reference style.
+
+---
+
+## Visual Priority
+
+Use this order when designing a finance scene:
+
+1. **Constructed visual system** - chart, flow, ledger, matrix, meter, timeline,
+   annotated balance sheet, ownership map, or diagnostic panel.
+2. **Hybrid image + overlay** - only when a real place/object adds information.
+   The overlay must still carry the argument.
+3. **Text-dominant frame** - only for short verdicts or breath beats.
+4. **Pure background treatment** - last resort, never the scene's main idea.
+
+At least half the scenes in a 10-18 sentence finance video should be diagrammatic
+or structurally visual.
 
 ---
 
 ## Backgrounds
 
-**BgSignal** — default for most finance scenes
-Clinical grid, tight. Use for: numbers, charts, data, market analysis.
+Backgrounds are surfaces, not the concept. Do not default to a dark theme. Choose
+light, dark, paper, terminal, dashboard, or photographic treatment based on the
+scene's informational job and the provided DESIGN tokens.
 
-```tsx
-import { BgSignal } from "@yt-shorts/video-renderer";
-<BgSignal frame={frame} startFrame={startFrame} />
-```
+**Signal surface** - for charts, grids, dashboards, diagnostics, market structure.
+Use when numbers need axes, rows, columns, thresholds, or comparison.
 
-**BgFlare** — for impact / hook moments
-Use for: the opening statement, crash moments, paradigm shifts.
+**Editorial surface** - for verdicts and breath beats.
+Can be light or dark depending on DESIGN.bg / DESIGN.surface and legibility.
 
-```tsx
-import { BgFlare } from "@yt-shorts/video-renderer";
-<BgFlare frame={frame} startFrame={startFrame} />
-```
-
-**BgDeepField** — for editorial / narrative sentences
-Use for: backstory, consequence, the human cost.
-
-```tsx
-import { BgDeepField } from "@yt-shorts/video-renderer";
-<BgDeepField frame={frame} startFrame={startFrame} />
-```
+**Photo surface** - for places, assets, buildings, exchanges, or institutions.
+Always use Ken Burns and an information-bearing overlay: labels, lines, panels,
+flow routes, or annotation.
 
 ---
 
 ## Background Image Priority
 
-- **Priority 1** — `guides/finance/bg/<topic-slug>.png` or `guides/finance/bg/default.png`
-- **Priority 2** — `public/bg-image.png`
-- **Priority 3** — Programmatic BgSignal / BgFlare / BgDeepField
+* **Priority 1** - `guides/finance/bg/<topic-slug>.png` or `guides/finance/bg/default.png`
+* **Priority 2** - `public/bg-image.png`
+* **Priority 3** - designed surfaces and diagram fields
 
-Copy to `public/bg-image.png`, animate with Ken Burns:
-```tsx
-const imgScale = interpolate(frame, [0, durationInFrames], [1.0, 1.06], { extrapolateRight: "clamp" });
-<Img src={staticFile("bg-image.png")} style={{ position: "absolute", inset: 0, width: "100%", height: "100%",
-  objectFit: "cover", filter: "saturate(0.5) brightness(0.35)", transform: `scale(${imgScale})` }} />
-<div style={{ position: "absolute", inset: 0,
-  background: "linear-gradient(to bottom, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.7) 100%)" }} />
-```
+Images must never be static and must never be used only for atmosphere. If an image
+does not clarify the sentence, build a diagram instead.
 
 ---
 
 ## Typography
 
-```typescript
-TOKEN.serif  // Headlines, the single defining number, verdict statements
-TOKEN.sans   // Narration, captions, chart labels, context
-TOKEN.mono   // Ticker symbols, dates, percentage labels, index names
-```
+Use tokenized typography only.
 
-Font sizes:
-- Massive stat: 160px serif 700
-- Display: 72–80px serif 700
-- Body: 36–42px sans 300
-- Ticker/label: 16–20px mono uppercase, `letterSpacing: "0.18em"`
+* `DESIGN.stat` - decisive figures, thresholds, percentages, dollar amounts
+* `DESIGN.display` - section labels, large nouns, binary oppositions
+* `DESIGN.body` - explanatory sentence text
+* `DESIGN.caption` - tickers, labels, dates, context, chart annotations
 
-```typescript
-TOKEN.white         // verdict sentences, major numbers
-TOKEN.dim           // body text, market context
-// Accent (#f0c040): percentage numbers, chart lines, key figures in highlight
-```
+Financial labels should often be uppercase, compact, and aligned to chart structure.
+Do not let captions float without a relationship to a line, axis, row, or object.
 
 ---
 
-## Components
+## Core Visual Components
 
-### KineticText
+### Money Flow
 
-```tsx
-<KineticText
-  text="The Dow fell 22 percent in a single day."
-  accentWords={["22 percent"]}
-  fontSize={42}
-  fontFamily={TOKEN.sans}
-  fontWeight={300}
-  frame={frame}
-  startFrame={startFrame}
-/>
-```
+Use for rent, dividends, borrowing, capital, and payouts.
 
-### Stamp — market labels
+Structure:
+`Tenant / Asset -> REIT box -> Dividend / Investor`
 
-```tsx
-<Stamp label="NYSE · October 19, 1987" frame={frame} startFrame={startFrame} />
-```
+Motion:
+Lines draw first. Nodes snap in. Amount labels arrive last.
 
----
+### Yield Comparison
 
-## Scene Templates
+Use for percentage gaps, spreads, alternatives, opportunity cost.
 
-### TplStatCallout — the number is the story
-Whenever there is a percentage, index value, dollar amount, or date.
+Structure:
+Two horizontal bars or rows sharing one axis. Accent marks the active instrument;
+muted value marks the benchmark.
 
-```tsx
-<TplStatCallout data={{
-  type: "stat_callout",
-  value: 22.6,
-  suffix: "%",
-  label: "single-day market loss",
-  context: "the largest one-day drop in Wall Street history",
-}} frame={frame} startFrame={startFrame} />
-```
+### Risk Compression
 
-### TplFlowDiagram — contagion, cause-effect, mechanisms
-Use for: how a financial crisis spreads, feedback loops, policy transmission.
+Use for rising rates, falling prices, margin pressure, leverage.
 
-```tsx
-<TplFlowDiagram data={{
-  type: "flow_diagram",
-  nodes: ["Subprime loans default", "MBS values collapse", "Banks lose capital", "Credit freezes", "GDP contracts"],
-  style: "arrow_chain",
-}} frame={frame} startFrame={startFrame} />
-```
+Structure:
+Two plates or bands squeeze a central profit block. Arrows point inward or downward.
 
-### TplTimeline — events with timestamps
+### Diagnostic Dashboard
 
-### TplEditorialHeadline — verdict statements
-"Nobody went to prison." / "The bailout was $700 billion."
+Use for metrics viewers should inspect.
 
-### TplTextDominant — consequence moments
-Short sentences that land after a devastating number.
+Structure:
+Three to five rows with status markers, warning thresholds, or meters. Do not make
+it decorative; each row should teach what to look at.
 
----
+### Liquidity Split
 
-## Script Voice Rules
+Use for wrapper/core contradictions.
 
-- Lead with the outcome: "The bank had $0 on Friday. Monday it was gone." not "In 2008, Lehman Brothers…"
-- Numbers carry the drama — let them breathe: "700 billion dollars." full stop.
-- No moral commentary — state the mechanism and let the viewer feel it
-- Use "breathe" beats right after the most damning number
-- The TURN is always the moment someone knew and did nothing, or the mechanism that made it inevitable
+Structure:
+A binary frame, membrane, lock, or shell/core diagram. One side moves quickly;
+the other stays fixed.
 
 ---
 
 ## Scene Template Mapping
 
 ```
-beat = "hook"    → TplEditorialHeadline + BgFlare (outcome stated immediately)
-beat = "build"   → TplStatCallout or TplTextDominant (stack the evidence)
-beat = "turn"    → TplEditorialHeadline (the mechanism or the betrayal)
-beat = "reveal"  → TplStatCallout or TplFlowDiagram (the actual scale)
-beat = "breathe" → TplTextDominant (one number, nothing else)
-beat = "close"   → TplEditorialHeadline (the verdict, the consequence)
-dataValue != null → TplStatCallout (always)
+beat = "hook"    -> high-impact object, number, or contradiction
+beat = "build"   -> diagram assembly, comparison, matrix, dashboard
+beat = "turn"    -> system breaks, splits, reverses, or gets relabeled
+beat = "reveal"  -> threshold, mechanism, or number made visually unavoidable
+beat = "breathe" -> restrained visual with one precise object, not empty by default
+beat = "close"   -> completed system or callback with new annotation
+dataValue != null -> show scale with chart, meter, threshold, or comparison
 ```
 
 ---
 
 ## Distribution Rules
 
-For a 10–18 sentence finance video:
-- At least 4 `TplStatCallout` — finance is a numbers story
-- At least 1 `TplFlowDiagram` — show the contagion/mechanism
-- At least 2 `TplTextDominant` for pressure-release after numbers
-- Use `TplTimeline` for any sequence of market events with dates
+For a 10-18 sentence finance video:
+
+* At least 4 quantitative scenes with visible scale.
+* At least 2 mechanism scenes using flows, arrows, pipes, compression, or layered systems.
+* At least 1 diagnostic dashboard or checklist.
+* At least 1 binary contradiction or tradeoff scene.
+* No more than 2 consecutive text-dominant scenes.
+* No more than 3 image-led scenes unless every image has a meaningful overlay.
+
+---
+
+## Script Voice Rules
+
+* Lead with the outcome or mechanism.
+* Numbers carry drama, but diagrams explain why they matter.
+* Avoid moral commentary. Show incentives and consequences.
+* Breath beats should clarify, not stall.
+* Turns should expose the variable that changes the system.

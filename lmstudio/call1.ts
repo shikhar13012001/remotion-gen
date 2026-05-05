@@ -1,8 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
-import { callLMStudioJSON, callLMStudioRaw, model } from "./caller.js";
-import { logScriptTable } from "../trace.js";
-import type { ScriptPackage } from "./types.js";
+import { callLMStudioJSON, callLMStudioRaw, model } from "./caller";
+import { logScriptTable } from "../trace";
+import type { ScriptPackage } from "./types";
+import { compactVisualQuery } from "./visualQuery";
 
 const PROMPT_DIR = path.join(__dirname, "prompts");
 const SCHEMA_DIR = path.join(__dirname, "schemas");
@@ -49,9 +50,7 @@ function coerceScriptPackage(raw: Record<string, unknown>): ScriptPackage {
     const isImageless = beat === "breathe" || beat === "close";
 
     const rawQuery = typeof s.visualQuery === "string" ? s.visualQuery.trim() : null;
-    const visualQuery = rawQuery && rawQuery.split(/\s+/).length >= 4 && !isImageless
-      ? rawQuery
-      : null;
+    const visualQuery = !isImageless ? compactVisualQuery(rawQuery) : null;
 
     const rawHighlights = Array.isArray(s.highlightWords)
       ? (s.highlightWords as unknown[]).filter((w): w is string => typeof w === "string")
