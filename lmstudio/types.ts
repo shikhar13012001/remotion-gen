@@ -45,6 +45,103 @@ export interface ScriptPackage {
   sentences:   ScriptSentence[];
 }
 
+export type ThemePolarity = "light" | "dark" | "mixed";
+
+export interface ScriptContextBundle {
+  topic: string;
+  source: {
+    title: string;
+    summary: string[];
+    keyFacts: string[];
+  };
+  design: {
+    sourceName: string;
+    accentColor: string;
+    themePolarity: ThemePolarity;
+    fontDisplay: string;
+    fontBody: string;
+    fontMono: string;
+    brandKeywords: string[];
+  };
+  guide: {
+    category: string | null;
+    tone: string[];
+    visualPriority: string[];
+    beatRules: Record<Beat, string>;
+    imagePolicy: {
+      allowImagesFor: string[];
+      discourageImagesFor: string[];
+    };
+    preferredVisualNouns: string[];
+    scriptConstraints: {
+      targetWords: [number, number];
+      targetSentences: [number, number];
+      requiredBeats: Beat[];
+    };
+  };
+  generationPolicy: {
+    visualQueryWords: [number, number];
+    accentAuthority: "design-first";
+    repairMode: "targeted";
+  };
+}
+
+export interface ScriptPlan {
+  centralQuestion: string;
+  closingTruth: string;
+  sentenceCountTarget: number;
+  wordCountTarget: [number, number];
+  actRanges: Array<{ label: string; start: number; end: number }>;
+  beatSequence: Beat[];
+  revealSentenceIndex: number;
+  breatheSentenceIndices: number[];
+  imageEligibleSentenceIndices: number[];
+  requiredDataSentenceIndices: number[];
+  visualMotifHints: string[];
+}
+
+export interface ScriptSpec {
+  sentenceRange: [number, number];
+  wordRange: [number, number];
+  durationRangeMs: [number, number];
+  requiredBeats: Beat[];
+  visualQueryWords: [number, number];
+}
+
+export interface ValidationIssue {
+  code: string;
+  sentenceIndex?: number;
+  field?: string;
+  message: string;
+  repairable: boolean;
+}
+
+export interface ValidationReport {
+  severity: "ok" | "warn" | "fail";
+  issues: ValidationIssue[];
+}
+
+export interface ValidatedScriptResult {
+  script: ScriptPackage;
+  report: ValidationReport;
+  corrected: boolean;
+  repaired: boolean;
+}
+
+export interface ScriptGenerationTrace {
+  promptSizes: {
+    contextBundleTokensApprox: number;
+    planPromptTokensApprox: number;
+    writePromptTokensApprox: number;
+  };
+  attempts: Array<{
+    stage: "plan" | "write" | "repair";
+    success: boolean;
+    issues: string[];
+  }>;
+  selectedSpec: ScriptSpec;
+}
+
 // ─── Call 1b output: VisualBrief ──────────────────────────────────────────────
 
 /** A narrative act — 2–4 sections that divide the script by momentum. */
@@ -205,9 +302,24 @@ export interface LMCallOptions {
   model?:       string;
   temperature?: number;
   maxTokens?:   number;
-  /** LM Studio structured output — passed as response_format.json_schema */
+  /** LM Studio structured output - passed as response_format.json_schema */
   schema?:      Record<string, unknown>;
   schemaName?:  string;
+}
+
+export interface PromptRequest {
+  systemPrompt: string;
+  userMessage: string;
+  model?: string;
+  temperature?: number;
+  maxTokens?: number;
+  schema?: Record<string, unknown>;
+  schemaName?: string;
+}
+
+export interface ScriptLLMProvider {
+  generateJSON<T>(input: PromptRequest): Promise<T>;
+  generateText(input: PromptRequest): Promise<string>;
 }
 
 // ─── Legacy types — kept for backward compatibility ───────────────────────────

@@ -1,172 +1,412 @@
 import * as fs from "fs";
 import * as path from "path";
-import { callLMStudioJSON, callLMStudioRaw, model } from "./caller";
+import { createScriptLLMProvider, model as defaultModel } from "./caller";
+import { buildDefaultScriptPlan, buildPlannerUserMessage, loadPlannerPrompt, sanitizeScriptPlan } from "./scriptPlanner";
+import { buildScriptPackageSchema, buildScriptPlanSchema } from "./scriptSchemas";
+import { compileScriptContextBundle } from "./scriptContext";
+import { summarizeValidationReport, validateScriptPackage } from "./scriptValidation";
 import { logScriptTable } from "../trace";
-import type { ScriptPackage } from "./types";
-import { compactVisualQuery } from "./visualQuery";
+import type {
+  PromptRequest,
+  ScriptContextBundle,
+  ScriptGenerationTrace,
+  ScriptLLMProvider,
+  ScriptPackage,
+  ScriptPlan,
+  ScriptSpec,
+  ValidationReport,
+} from "./types";
 
 const PROMPT_DIR = path.join(__dirname, "prompts");
-const SCHEMA_DIR = path.join(__dirname, "schemas");
 
-const PROMPT_CALL1 = fs.readFileSync(path.join(PROMPT_DIR, "prompt_call1_script.txt"), "utf8");
-const SCHEMA_A     = JSON.parse(
-  fs.readFileSync(path.join(SCHEMA_DIR, "schemaA_script.json"), "utf8")
-) as Record<string, unknown>;
-
-const REPAIR_PROMPT =
-  "You are a JSON repair tool. The previous response was not valid JSON.\n" +
-  "Return ONLY the corrected ScriptPackage JSON object, nothing else.\n" +
-  "No markdown fences. No explanation. Just the JSON.\n\n" +
-  "Required: topic (string), total_words (integer), accentColor (#rrggbb), " +
-  "sentences array with index/text/beat/word_count/suggested_duration_ms/" +
-  "visualQuery/needsImage/highlightWords/dataValue per item.\n\n" +
-  "Previous broken output:\n";
-
-const MIN_SENTENCES = 8;
-const MAX_ATTEMPTS  = 3;
-
-function buildUserMessage(rawContent: string, attempt: number, guide?: string, design?: string): string {
-  const prefix = attempt > 1
-    ? `IMPORTANT: Your previous response had too few sentences. ` +
-      `You MUST write exactly 10–16 sentences in the sentences array. ` +
-      `First sentence beat MUST be "hook". Last sentence beat MUST be "close".\n\n`
-    : "";
-  const designSection = design
-    ? `DESIGN SYSTEM:\n${"\u2500".repeat(60)}\n${design}\n${"\u2500".repeat(60)}\n\n`
-    : "";
-  const guideSection = guide
-    ? `CREATIVE GUIDE FOR THIS CATEGORY:\n${"\u2500".repeat(60)}\n${guide}\n${"\u2500".repeat(60)}\n\n`
-    : "";
-  return `${designSection}${guideSection}${prefix}Topic: ${rawContent.trim()}`;
+function readPrompt(fileName: string, fallback: string): string {
+  const promptPath = path.join(PROMPT_DIR, fileName);
+  return fs.existsSync(promptPath) ? fs.readFileSync(promptPath, "utf-8").trim() : fallback;
 }
 
-function coerceScriptPackage(raw: Record<string, unknown>): ScriptPackage {
-  const sentences = Array.isArray(raw.sentences) ? raw.sentences as Record<string, unknown>[] : [];
+const WRITER_PROMPT = readPrompt(
+  "prompt_script_writer.txt",
+  "Return only valid ScriptPackage JSON that follows the supplied plan and spec.",
+);
+const JSON_REPAIR_PROMPT = readPrompt(
+  "prompt_script_json_repair.txt",
+  "Return only valid JSON. Repair syntax only.",
+);
+const SEMANTIC_REPAIR_PROMPT = readPrompt(
+  "prompt_script_semantic_repair.txt",
+  "Return only valid ScriptPackage JSON and fix only the issues listed.",
+);
 
-  const cleaned = sentences.map((s, i) => {
-    const text = typeof s.text === "string" ? s.text : "";
-    const beat = (["hook","build","turn","reveal","breathe","close"] as const)
-      .includes(s.beat as "hook") ? s.beat as ScriptPackage["sentences"][0]["beat"] : "build";
-    const isImageless = beat === "breathe" || beat === "close";
+interface RunCall1Options {
+  temperature?: number;
+  model?: string;
+  guideContent?: string;
+  guidePath?: string;
+  designContent?: string;
+  designPath?: string;
+  provider?: ScriptLLMProvider;
+}
 
-    const rawQuery = typeof s.visualQuery === "string" ? s.visualQuery.trim() : null;
-    const visualQuery = !isImageless ? compactVisualQuery(rawQuery) : null;
+export interface RunCall1Result {
+  script: ScriptPackage;
+  context: ScriptContextBundle;
+  plan: ScriptPlan;
+  spec: ScriptSpec;
+  trace: ScriptGenerationTrace;
+  validation: ValidationReport;
+}
 
-    const rawHighlights = Array.isArray(s.highlightWords)
-      ? (s.highlightWords as unknown[]).filter((w): w is string => typeof w === "string")
-      : [];
-    const lowerText = text.toLowerCase();
-    const highlightWords = rawHighlights.filter(w => lowerText.includes(w.toLowerCase())).slice(0, 3);
+function approxTokens(value: string): number {
+  return Math.max(1, Math.round(value.length / 4));
+}
 
-    return {
-      index:                 typeof s.index  === "number" ? s.index  : i + 1,
-      text,
-      beat,
-      word_count:            typeof s.word_count === "number" ? s.word_count : text.split(" ").length,
-      suggested_duration_ms: typeof s.suggested_duration_ms === "number"
-                               ? Math.min(8000, Math.max(2000, s.suggested_duration_ms))
-                               : 3000,
-      visualQuery,
-      needsImage:            typeof s.needsImage === "boolean" ? s.needsImage && !isImageless : visualQuery !== null,
-      highlightWords,
-      dataValue:             typeof s.dataValue === "number" && isFinite(s.dataValue) ? s.dataValue : null,
-    };
-  });
+function addAttempt(
+  trace: ScriptGenerationTrace,
+  stage: "plan" | "write" | "repair",
+  success: boolean,
+  issues: string[],
+): void {
+  trace.attempts.push({ stage, success, issues });
+}
 
-  // Ensure first is hook, last is close
-  if (cleaned.length > 0 && cleaned[0].beat !== "hook")   cleaned[0].beat  = "hook";
-  if (cleaned.length > 1 && cleaned[cleaned.length - 1].beat !== "close") cleaned[cleaned.length - 1].beat = "close";
-
-  // Redistribute interior beats if model returned all the same value (e.g. all "close")
-  const interior = cleaned.slice(1, -1);
-  if (interior.length > 1) {
-    const beatCounts: Record<string, number> = {};
-    for (const s of interior) beatCounts[s.beat] = (beatCounts[s.beat] ?? 0) + 1;
-    const maxCount = Math.max(...Object.values(beatCounts));
-    if (maxCount / interior.length >= 0.7) {
-      const INTERIOR_BEATS: ScriptPackage["sentences"][0]["beat"][] =
-        ["build", "build", "turn", "reveal", "build", "breathe"];
-      interior.forEach((s, i) => { s.beat = INTERIOR_BEATS[i % INTERIOR_BEATS.length]; });
-    }
-  }
-
-  const color = typeof raw.accentColor === "string" && /^#[0-9a-f]{6}$/i.test(raw.accentColor)
-    ? raw.accentColor : "#c8a96e";
-
+function buildPromptRequest(
+  systemPrompt: string,
+  userMessage: string,
+  spec: {
+    model?: string;
+    temperature?: number;
+    maxTokens?: number;
+    schema?: Record<string, unknown>;
+    schemaName?: string;
+  },
+): PromptRequest {
   return {
-    topic:       typeof raw.topic       === "string" ? raw.topic       : "Unknown",
-    total_words: typeof raw.total_words === "number" ? raw.total_words : cleaned.reduce((a, s) => a + s.word_count, 0),
-    accentColor: color,
-    sentences:   cleaned,
+    systemPrompt,
+    userMessage,
+    model: spec.model,
+    temperature: spec.temperature,
+    maxTokens: spec.maxTokens,
+    schema: spec.schema,
+    schemaName: spec.schemaName,
   };
 }
 
-export async function runCall1(
-  rawContent: string,
-  opts: { temperature?: number; guide?: string; design?: string } = {}
-): Promise<ScriptPackage> {
-  console.log("\n  ── CALL 1: Script writer ──────────────────────────────────────────────────────");
+function buildWriterUserMessage(
+  context: ScriptContextBundle,
+  spec: ScriptSpec,
+  plan: ScriptPlan,
+  extraIssues: string[] = [],
+): string {
+  const lines = [
+    "SCRIPT CONTEXT BUNDLE:",
+    JSON.stringify(context, null, 2),
+    "",
+    "SCRIPT SPEC:",
+    JSON.stringify(spec, null, 2),
+    "",
+    "SCRIPT PLAN:",
+    JSON.stringify(plan, null, 2),
+  ];
 
-  let output: ScriptPackage | null = null;
-
-  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
-    if (attempt > 1) console.log(`  ↻  Retry ${attempt}/${MAX_ATTEMPTS}`);
-
-    let result: Record<string, unknown>;
-    try {
-      result = await callLMStudioJSON<Record<string, unknown>>(
-        PROMPT_CALL1,
-        buildUserMessage(rawContent, attempt, opts.guide, opts.design),
-        { model, temperature: opts.temperature ?? 0.6, maxTokens: 3000, schema: SCHEMA_A, schemaName: "script_package" }
-      );
-    } catch (parseErr) {
-      // JSON parse failed — run repair
-      console.warn(`  ⚠  Call 1 parse failed (attempt ${attempt}) — attempting repair…`);
-      try {
-        const rawStr = await callLMStudioRaw(
-          PROMPT_CALL1,
-          buildUserMessage(rawContent, attempt, opts.guide),
-          { model, temperature: opts.temperature ?? 0.6, maxTokens: 3000 }
-        );
-        const repairMsg = REPAIR_PROMPT + rawStr;
-        result = await callLMStudioJSON<Record<string, unknown>>(
-          "You are a JSON repair tool. Return only valid JSON.",
-          repairMsg,
-          { model, temperature: 0.1, maxTokens: 3000 }
-        );
-      } catch (repairErr) {
-        console.warn(`  ✗  Repair failed on attempt ${attempt}:`, repairErr instanceof Error ? repairErr.message : repairErr);
-        if (attempt === MAX_ATTEMPTS) throw repairErr;
-        continue;
-      }
-    }
-
-    const candidate = coerceScriptPackage(result);
-
-    if (candidate.sentences.length >= MIN_SENTENCES) {
-      output = candidate;
-      break;
-    }
-    console.warn(`  ⚠  Attempt ${attempt}: ${candidate.sentences.length} sentences (need ≥${MIN_SENTENCES})`);
-    if (attempt === MAX_ATTEMPTS) {
-      console.warn(`  ⚠  All ${MAX_ATTEMPTS} attempts under-spec — using best result`);
-      output = candidate;
+  if (extraIssues.length > 0) {
+    lines.push("");
+    lines.push("ISSUES TO FIX IN THIS ATTEMPT:");
+    for (const issue of extraIssues) {
+      lines.push(`- ${issue}`);
     }
   }
 
-  const pkg = output!;
-  const hookCount = pkg.sentences.filter(s => s.beat === "hook").length;
-  const closeCount = pkg.sentences.filter(s => s.beat === "close").length;
-  const revealCount = pkg.sentences.filter(s => s.beat === "reveal").length;
+  return lines.join("\n");
+}
 
-  if (hookCount === 0)   console.warn("  ⚠  No hook beat found — first sentence will be treated as hook");
-  if (closeCount === 0)  console.warn("  ⚠  No close beat found — last sentence will be treated as close");
-  if (revealCount === 0) console.warn("  ⚠  No reveal beat found — consider adding one for narrative impact");
+function buildJsonRepairUserMessage(targetName: string, brokenOutput: string): string {
+  return [
+    `TARGET TYPE: ${targetName}`,
+    "",
+    "BROKEN OUTPUT:",
+    brokenOutput,
+  ].join("\n");
+}
 
-  const totalMs = pkg.sentences.reduce((a, s) => a + s.suggested_duration_ms, 0);
-  console.log(`  ✅  Call 1 — ${pkg.sentences.length} sentences · ${pkg.total_words} words · ~${Math.round(totalMs / 1000)}s`);
-  console.log(`      accent: ${pkg.accentColor}  |  "${pkg.topic}"`);
+function buildSemanticRepairUserMessage(
+  context: ScriptContextBundle,
+  spec: ScriptSpec,
+  plan: ScriptPlan,
+  currentScript: ScriptPackage,
+  report: ValidationReport,
+): string {
+  return [
+    "SCRIPT CONTEXT BUNDLE:",
+    JSON.stringify(context, null, 2),
+    "",
+    "SCRIPT SPEC:",
+    JSON.stringify(spec, null, 2),
+    "",
+    "SCRIPT PLAN:",
+    JSON.stringify(plan, null, 2),
+    "",
+    "CURRENT SCRIPT PACKAGE:",
+    JSON.stringify(currentScript, null, 2),
+    "",
+    "VALIDATION ISSUES:",
+    JSON.stringify(report.issues, null, 2),
+  ].join("\n");
+}
+
+async function repairMalformedJson(
+  provider: ScriptLLMProvider,
+  model: string,
+  temperature: number,
+  targetName: string,
+  schema: Record<string, unknown>,
+  brokenOutput: string,
+): Promise<Record<string, unknown>> {
+  return provider.generateJSON<Record<string, unknown>>(buildPromptRequest(
+    JSON_REPAIR_PROMPT,
+    buildJsonRepairUserMessage(targetName, brokenOutput),
+    {
+      model,
+      temperature: 0.1,
+      maxTokens: 6000,
+      schema,
+      schemaName: targetName.toLowerCase(),
+    },
+  ));
+}
+
+async function generatePlan(
+  provider: ScriptLLMProvider,
+  context: ScriptContextBundle,
+  spec: ScriptSpec,
+  trace: ScriptGenerationTrace,
+  requestModel: string,
+  temperature: number,
+): Promise<ScriptPlan> {
+  const systemPrompt = loadPlannerPrompt();
+  const userMessage = buildPlannerUserMessage(context, spec);
+  trace.promptSizes.planPromptTokensApprox = approxTokens(systemPrompt) + approxTokens(userMessage);
+  const schema = buildScriptPlanSchema(spec);
+
+  try {
+    const rawPlan = await provider.generateJSON<Record<string, unknown>>(buildPromptRequest(
+      systemPrompt,
+      userMessage,
+      {
+        model: requestModel,
+        temperature,
+        maxTokens: 3500,
+        schema,
+        schemaName: "script_plan",
+      },
+    ));
+    addAttempt(trace, "plan", true, []);
+    return sanitizeScriptPlan(rawPlan, context, spec);
+  } catch (error) {
+    addAttempt(trace, "plan", false, [error instanceof Error ? error.message : String(error)]);
+  }
+
+  try {
+    const rawText = await provider.generateText(buildPromptRequest(
+      systemPrompt,
+      userMessage,
+      {
+        model: requestModel,
+        temperature,
+        maxTokens: 3500,
+      },
+    ));
+    const repaired = await repairMalformedJson(
+      provider,
+      requestModel,
+      temperature,
+      "ScriptPlan",
+      schema,
+      rawText,
+    );
+    addAttempt(trace, "repair", true, ["Recovered malformed planner JSON."]);
+    return sanitizeScriptPlan(repaired, context, spec);
+  } catch (error) {
+    addAttempt(trace, "repair", false, [error instanceof Error ? error.message : String(error)]);
+  }
+
+  return buildDefaultScriptPlan(context, spec);
+}
+
+async function generateScriptCandidate(
+  provider: ScriptLLMProvider,
+  context: ScriptContextBundle,
+  spec: ScriptSpec,
+  plan: ScriptPlan,
+  trace: ScriptGenerationTrace,
+  requestModel: string,
+  temperature: number,
+  extraIssues: string[] = [],
+): Promise<Record<string, unknown>> {
+  const systemPrompt = WRITER_PROMPT;
+  const userMessage = buildWriterUserMessage(context, spec, plan, extraIssues);
+  trace.promptSizes.writePromptTokensApprox = approxTokens(systemPrompt) + approxTokens(userMessage);
+  const schema = buildScriptPackageSchema(spec);
+
+  try {
+    const result = await provider.generateJSON<Record<string, unknown>>(buildPromptRequest(
+      systemPrompt,
+      userMessage,
+      {
+        model: requestModel,
+        temperature,
+        maxTokens: 7000,
+        schema,
+        schemaName: "script_package",
+      },
+    ));
+    addAttempt(trace, "write", true, extraIssues);
+    return result;
+  } catch (error) {
+    addAttempt(trace, "write", false, [error instanceof Error ? error.message : String(error)]);
+  }
+
+  const rawText = await provider.generateText(buildPromptRequest(
+    systemPrompt,
+    userMessage,
+    {
+      model: requestModel,
+      temperature,
+      maxTokens: 7000,
+    },
+  ));
+  const repaired = await repairMalformedJson(
+    provider,
+    requestModel,
+    temperature,
+    "ScriptPackage",
+    schema,
+    rawText,
+  );
+  addAttempt(trace, "repair", true, ["Recovered malformed writer JSON."]);
+  return repaired;
+}
+
+function scoreReport(report: ValidationReport): number {
+  const severityWeight = report.severity === "ok" ? 0 : report.severity === "warn" ? 100 : 200;
+  return severityWeight + report.issues.length;
+}
+
+function pickBetterScript(
+  left: ReturnType<typeof validateScriptPackage>,
+  right: ReturnType<typeof validateScriptPackage>,
+): ReturnType<typeof validateScriptPackage> {
+  return scoreReport(left.report) <= scoreReport(right.report) ? left : right;
+}
+
+export async function runCall1(rawContent: string, opts: RunCall1Options = {}): Promise<RunCall1Result> {
+  console.log("\n  -- CALL 1: Script subsystem ----------------------------------------");
+
+  const provider = opts.provider ?? createScriptLLMProvider();
+  const requestModel = opts.model ?? defaultModel;
+  const temperature = opts.temperature ?? 0.45;
+
+  const compiled = compileScriptContextBundle({
+    topic: rawContent,
+    guideContent: opts.guideContent,
+    guidePath: opts.guidePath,
+    designContent: opts.designContent,
+    designPath: opts.designPath,
+  });
+
+  const trace: ScriptGenerationTrace = {
+    promptSizes: {
+      contextBundleTokensApprox: compiled.contextTokensApprox,
+      planPromptTokensApprox: 0,
+      writePromptTokensApprox: 0,
+    },
+    attempts: [],
+    selectedSpec: compiled.spec,
+  };
+
+  const plan = await generatePlan(
+    provider,
+    compiled.bundle,
+    compiled.spec,
+    trace,
+    requestModel,
+    temperature,
+  );
+
+  let candidateRaw = await generateScriptCandidate(
+    provider,
+    compiled.bundle,
+    compiled.spec,
+    plan,
+    trace,
+    requestModel,
+    temperature,
+  );
+
+  let validated = validateScriptPackage(candidateRaw, compiled.bundle, plan, compiled.spec);
+
+  if (validated.report.severity === "fail") {
+    try {
+      const repairedRaw = await provider.generateJSON<Record<string, unknown>>(buildPromptRequest(
+        SEMANTIC_REPAIR_PROMPT,
+        buildSemanticRepairUserMessage(compiled.bundle, compiled.spec, plan, validated.script, validated.report),
+        {
+          model: requestModel,
+          temperature: 0.2,
+          maxTokens: 7000,
+          schema: buildScriptPackageSchema(compiled.spec),
+          schemaName: "script_package",
+        },
+      ));
+      addAttempt(trace, "repair", true, summarizeValidationReport(validated.report));
+      const repairedValidated = validateScriptPackage(repairedRaw, compiled.bundle, plan, compiled.spec);
+      repairedValidated.repaired = true;
+      validated = pickBetterScript(validated, repairedValidated);
+    } catch (error) {
+      addAttempt(trace, "repair", false, [error instanceof Error ? error.message : String(error)]);
+    }
+  }
+
+  if (validated.report.severity === "fail") {
+    try {
+      candidateRaw = await generateScriptCandidate(
+        provider,
+        compiled.bundle,
+        compiled.spec,
+        plan,
+        trace,
+        requestModel,
+        temperature,
+        summarizeValidationReport(validated.report),
+      );
+      const rerunValidated = validateScriptPackage(candidateRaw, compiled.bundle, plan, compiled.spec);
+      validated = pickBetterScript(validated, rerunValidated);
+    } catch (error) {
+      addAttempt(trace, "write", false, [error instanceof Error ? error.message : String(error)]);
+    }
+  }
+
+  if (validated.script.sentences.length === 0) {
+    throw new Error("Script generation produced no usable sentences.");
+  }
+
+  const pkg = validated.script;
+  const totalMs = pkg.sentences.reduce((sum, sentence) => sum + sentence.suggested_duration_ms, 0);
+  console.log(`  Generated plan for ${plan.sentenceCountTarget} sentences.`);
+  console.log(`  Script result: ${pkg.sentences.length} sentences, ${pkg.total_words} words, ~${Math.round(totalMs / 1000)}s`);
+  if (validated.report.issues.length > 0) {
+    console.warn("  Validation notes:");
+    for (const issue of summarizeValidationReport(validated.report)) {
+      console.warn(`    - ${issue}`);
+    }
+  }
   logScriptTable(pkg);
 
-  return pkg;
+  return {
+    script: pkg,
+    context: compiled.bundle,
+    plan,
+    spec: compiled.spec,
+    trace,
+    validation: validated.report,
+  };
 }

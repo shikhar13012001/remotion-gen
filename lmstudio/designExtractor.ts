@@ -160,17 +160,36 @@ function parseMarkdownColors(content: string): Record<string, string> {
 function parseMarkdownFonts(content: string): { display?: string; body?: string; mono?: string } {
   const result: { display?: string; body?: string; mono?: string } = {};
 
-  // Look for "Primary: `FontName`" or "Display: `FontName`" patterns
-  const primary = content.match(/(?:Primary|Display|Heading).*?[`'"]([A-Z][^`'"]{2,40})[`'"]/i);
-  if (primary) result.display = primary[1].trim();
+  const invalid = /^(liga|swap|auto|normal|inherit|initial|block|optional|fallback|tight|relaxed)$/i;
+  const isValidFont = (value: string): boolean => {
+    return !invalid.test(value) &&
+      /^[A-Za-z0-9][A-Za-z0-9 -]{1,40}$/.test(value) &&
+      !/[.:]/.test(value);
+  };
 
-  // Body font
-  const body = content.match(/(?:Body|Sans|Regular).*?[`'"]([A-Z][^`'"]{2,40})[`'"]/i);
-  if (body && body[1] !== result.display) result.body = body[1].trim();
+  const assignIfValid = (slot: "display" | "body" | "mono", value: string | undefined): void => {
+    if (!value) return;
+    const trimmed = value.trim();
+    if (!trimmed || !isValidFont(trimmed)) return;
+    if (!result[slot]) result[slot] = trimmed;
+  };
 
-  // Mono
-  const mono = content.match(/(?:Mono|Code|Monospace).*?[`'"]([A-Z][^`'"]{2,40})[`'"]/i);
-  if (mono) result.mono = mono[1].trim();
+  const lines = content.split(/\r?\n/);
+  for (const line of lines) {
+    const inlineMatch = line.match(/[`'"]([A-Za-z0-9][A-Za-z0-9 -]{1,40})[`'"]/);
+    const tableParts = line.startsWith("|") ? line.split("|").map((part) => part.trim()) : [];
+    const tableFont = tableParts.length > 2 ? tableParts[2] : undefined;
+
+    if (/Primary|Display|Heading|Font Family/i.test(line)) {
+      assignIfValid("display", inlineMatch?.[1] ?? tableFont);
+    }
+    if (/(?:^|\b)(Body|Sans|Regular)(?:\b|$)/i.test(line) && !/Mono|Monospace|Code/i.test(line)) {
+      assignIfValid("body", inlineMatch?.[1] ?? tableFont);
+    }
+    if (/Mono|Code|Monospace/i.test(line)) {
+      assignIfValid("mono", inlineMatch?.[1] ?? tableFont);
+    }
+  }
 
   return result;
 }
@@ -248,7 +267,7 @@ function resolveBackground(colors: Record<string, string>): string {
   if (explicitDark) return explicitDark;
 
   const explicitCanvas =
-    findByKey(colors, ["canvas", "page-bg", "page-background", "background", "surface-light", "white"]) ??
+    findByKey(colors, ["pure-white", "white", "canvas", "page-bg", "surface-light", "page-background"]) ??
     findByKey(colors, ["surface-card", "surface-soft"]);
   if (isLightColor(explicitCanvas)) return explicitCanvas!;
 
@@ -278,7 +297,8 @@ function resolveSurface(colors: Record<string, string>, background: string): str
 function resolveTextOn(colors: Record<string, string>, background: string): string {
   if (isLightColor(background)) {
     return (
-      findByKey(colors, ["ink", "text", "body", "black-1", "star-rating"]) ??
+      findByKey(colors, ["gray-900", "neutral-900", "slate-900", "vercel-black", "ink", "black-1"]) ??
+      findByKey(colors, ["body", "text"]) ??
       darkest(colors)
     );
   }
@@ -293,7 +313,7 @@ function resolveTextOn(colors: Record<string, string>, background: string): stri
 function resolveTextMuted(colors: Record<string, string>, background: string): string {
   if (isLightColor(background)) {
     return (
-      findByKey(colors, ["muted", "body", "muted-soft"]) ??
+      findByKey(colors, ["gray-600", "gray-500", "muted", "body", "muted-soft"]) ??
       "#6a6a6a"
     );
   }
@@ -306,9 +326,16 @@ function resolveTextMuted(colors: Record<string, string>, background: string): s
 }
 
 function resolveBorder(colors: Record<string, string>, background: string): string {
+  if (isLightColor(background)) {
+    return (
+      findByKey(colors, ["gray-100", "border", "divider", "ring-border"]) ??
+      "rgba(0,0,0,0.08)"
+    );
+  }
+
   const hit = findByKey(colors, ["hairline", "hairline-soft", "border", "divider"]);
   if (hit && isDarkColor(background) && luminance(hit) > 0.5) {
-    // The design's border is light — reinterpret as low-opacity for dark video
+    // The design's border is light - reinterpret as low-opacity for dark video
     return hexToRgba(hit, 0.12);
   }
   return hit ?? "rgba(255,255,255,0.08)";
@@ -328,12 +355,13 @@ function resolveDisplayFont(typo: Record<string, RawScale>, mdFonts: { display?:
   return first?.fontFamily ?? "Georgia, 'Times New Roman', serif";
 }
 
-function resolveBodyFont(typo: Record<string, RawScale>, mdFonts: { body?: string }): string {
+function resolveBodyFont(typo: Record<string, RawScale>, mdFonts: { body?: string; display?: string }): string {
   const keys = ["body-md", "body", "body-lg", "text-md", "text", "title-lg", "label"];
   for (const k of keys) {
     if (typo[k]?.fontFamily) return typo[k].fontFamily!;
   }
   if (mdFonts.body) return mdFonts.body;
+  if (mdFonts.display) return mdFonts.display;
   return "'Helvetica Neue', Arial, sans-serif";
 }
 

@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { TEXT_CLEAN_PREFIX } from "./constants";
-import type { LMCallOptions } from "./types";
+import type { LMCallOptions, PromptRequest, ScriptLLMProvider } from "./types";
 import * as dotenv from "dotenv";
 
 try { dotenv.config(); } catch {}
@@ -38,12 +38,39 @@ export async function callLMStudioText(
 }
 
 function extractJSON(raw: string): string {
+  // Try fenced code blocks first
   const fenced = raw.match(/```(?:json)?\s*([\s\S]*?)```/);
-  if (fenced) return fenced[1].trim();
+  if (fenced) return sanitizeJSON(fenced[1].trim());
+  
+  // Fall back to finding object bounds
   const start = raw.indexOf("{");
   const end   = raw.lastIndexOf("}");
-  if (start !== -1 && end !== -1) return raw.slice(start, end + 1);
-  return raw.trim();
+  if (start !== -1 && end !== -1) return sanitizeJSON(raw.slice(start, end + 1));
+  
+  return sanitizeJSON(raw.trim());
+}
+
+/**
+ * Sanitize JSON by removing common parse errors:
+ * - Trailing commas before ] or }
+ * - Unescaped newlines in strings
+ * - Comments
+ */
+function sanitizeJSON(json: string): string {
+  // Remove comments (// and /* */)
+  json = json.replace(/\/\/.*?$/gm, "").replace(/\/\*[\s\S]*?\*\//g, "");
+  
+  // Remove trailing commas before ] and }
+  json = json.replace(/,\s*([}\]])/g, "$1");
+  
+  // Fix unescaped newlines in string values by replacing them with \n
+  // This is tricky but necessary for model outputs that contain line breaks
+  // Match strings and replace internal newlines with escaped versions
+  json = json.replace(/"([^"\\]|\\.)*"/g, (match) => {
+    return match.replace(/\n/g, "\\n").replace(/\r/g, "\\r").replace(/\t/g, "\\t");
+  });
+  
+  return json;
 }
 
 export async function callLMStudioRaw(
@@ -102,11 +129,61 @@ export async function callLMStudioJSON<T = unknown>(
     try {
       return JSON.parse(raw) as T;
     } catch (parseErr) {
-      console.warn(`  ⚠️  [Attempt ${attempt}/${maxAttempts}] JSON parse failed:`, parseErr);
+      const err = parseErr as SyntaxError;
+      const pos = err.message.match(/position (\d+)/)?.[1] ?? "unknown";
+      const context = raw.slice(
+        Math.max(0, parseInt(pos) - 50),
+        Math.min(raw.length, parseInt(pos) + 50)
+      );
+      
+      console.warn(
+        `  ⚠️  [Attempt ${attempt}/${maxAttempts}] JSON parse failed at position ${pos}:\n` +
+        `      ...${context}...\n` +
+        `      Error: ${err.message}`
+      );
+      
       if (attempt === maxAttempts) {
-        throw new Error(`Failed to parse valid JSON after ${maxAttempts} attempts.\n${raw}`);
+        // Show first 500 chars of malformed JSON for debugging
+        const preview = raw.slice(0, 500).replace(/\n/g, "\\n");
+        throw new Error(
+          `Failed to parse JSON after ${maxAttempts} attempts.\n` +
+          `Error at position ${pos}: ${err.message}\n` +
+          `First 500 chars:\n${preview}`
+        );
       }
     }
   }
   throw new Error("Unexpected retry loop exit");
+}
+
+export class LMStudioScriptProvider implements ScriptLLMProvider {
+  async generateJSON<T>(input: PromptRequest): Promise<T> {
+    return callLMStudioJSON<T>(
+      input.systemPrompt,
+      input.userMessage,
+      {
+        model: input.model,
+        temperature: input.temperature,
+        maxTokens: input.maxTokens,
+        schema: input.schema,
+        schemaName: input.schemaName,
+      },
+    );
+  }
+
+  async generateText(input: PromptRequest): Promise<string> {
+    return callLMStudioText(
+      input.systemPrompt,
+      input.userMessage,
+      {
+        model: input.model,
+        temperature: input.temperature,
+        maxTokens: input.maxTokens,
+      },
+    );
+  }
+}
+
+export function createScriptLLMProvider(): ScriptLLMProvider {
+  return new LMStudioScriptProvider();
 }

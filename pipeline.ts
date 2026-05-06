@@ -139,6 +139,9 @@ async function runPipeline(): Promise<void> {
   console.log(`\nPipeline complete in ${((Date.now() - pipelineStart) / 1000).toFixed(1)}s`);
   console.log("\nOutputs:");
   console.log("   Script  : data/output/script.json");
+  console.log("   Context : data/output/script_context.json");
+  console.log("   Plan    : data/output/script_plan.json");
+  console.log("   Trace   : data/output/script_trace.json");
   if (audioResult.audioFile) {
     console.log("   Audio   : public/voice.mp3");
     console.log("   Timing  : public/timing.json");

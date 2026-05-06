@@ -29,6 +29,8 @@ function loadSystemPrompt(): string {
   return [
     "You are an art director for short-form explanatory video.",
     "For each script sentence, produce a per-scene visual direction brief.",
+    "OUTPUT FORMAT: MARKDOWN ONLY. NOT JSON. Write plain text markdown sections with --- dividers.",
+    "Do NOT output JSON, arrays, curly braces, or structured formats.",
     "Prefer diagrams, charts, flows, ledgers, matrices, gauges, maps, and annotated systems over plain text on generic backgrounds.",
     "Do not imitate named creators or channels. Do not assume a dark theme.",
     "Use only DESIGN.* values for colors, fonts, spacing, and sizes.",
@@ -89,13 +91,21 @@ export async function runArtDirector(
   const userMessage = buildUserMessage(script, opts);
 
   try {
-    const result = await callLMStudioText(systemPrompt, userMessage, {
+    let result = await callLMStudioText(systemPrompt, userMessage, {
       temperature: opts.temperature ?? 0.65,
       maxTokens: opts.maxTokens ?? 12000,
     });
 
     if (!result || result.trim().length < 200) {
       console.warn("  Art director: LLM returned an unexpectedly short response; using fallback brief");
+      return null;
+    }
+
+    // Check if the LLM returned JSON despite being asked for markdown
+    const trimmed = result.trim();
+    if (trimmed.startsWith("{") || trimmed.startsWith("[")) {
+      console.warn("  ⚠️  Art director returned JSON instead of markdown. LM Studio may have JSON mode enabled globally.");
+      console.warn("  ⚠️  Disable JSON mode in LM Studio settings or convert the response to markdown.");
       return null;
     }
 

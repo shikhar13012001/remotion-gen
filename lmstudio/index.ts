@@ -6,6 +6,13 @@ export type {
   Beat,
   ScriptSentence,
   ScriptPackage,
+  ScriptContextBundle,
+  ScriptPlan,
+  ScriptSpec,
+  ValidationReport,
+  ValidatedScriptResult,
+  ScriptGenerationTrace,
+  ScriptLLMProvider,
   // Scene/directive types
   SceneTemplate,
   TemplateData,

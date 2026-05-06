@@ -14,11 +14,13 @@ active values, and the single most important figure in a scene.
 
 Never imitate any named creator, YouTube channel, or documentary reference style.
 
+
 ---
 
 ## Visual Priority
 
 Use this order when designing a finance scene:
+
 
 1. **Constructed visual system** - chart, flow, ledger, matrix, meter, timeline,
    annotated balance sheet, ownership map, or diagnostic panel.
@@ -29,6 +31,7 @@ Use this order when designing a finance scene:
 
 At least half the scenes in a 10-18 sentence finance video should be diagrammatic
 or structurally visual.
+
 
 ---
 
@@ -48,6 +51,7 @@ Can be light or dark depending on DESIGN.bg / DESIGN.surface and legibility.
 Always use Ken Burns and an information-bearing overlay: labels, lines, panels,
 flow routes, or annotation.
 
+
 ---
 
 ## Background Image Priority
@@ -58,6 +62,7 @@ flow routes, or annotation.
 
 Images must never be static and must never be used only for atmosphere. If an image
 does not clarify the sentence, build a diagram instead.
+
 
 ---
 
@@ -72,6 +77,7 @@ Use tokenized typography only.
 
 Financial labels should often be uppercase, compact, and aligned to chart structure.
 Do not let captions float without a relationship to a line, axis, row, or object.
+
 
 ---
 
@@ -118,6 +124,7 @@ Structure:
 A binary frame, membrane, lock, or shell/core diagram. One side moves quickly;
 the other stays fixed.
 
+
 ---
 
 ## Scene Template Mapping
@@ -132,6 +139,7 @@ beat = "close"   -> completed system or callback with new annotation
 dataValue != null -> show scale with chart, meter, threshold, or comparison
 ```
 
+
 ---
 
 ## Distribution Rules
@@ -145,6 +153,7 @@ For a 10-18 sentence finance video:
 * No more than 2 consecutive text-dominant scenes.
 * No more than 3 image-led scenes unless every image has a meaningful overlay.
 
+
 ---
 
 ## Script Voice Rules
@@ -154,3 +163,5 @@ For a 10-18 sentence finance video:
 * Avoid moral commentary. Show incentives and consequences.
 * Breath beats should clarify, not stall.
 * Turns should expose the variable that changes the system.
+
+

@@ -570,13 +570,23 @@ export async function resolveImageAssets(opts: {
     const backgroundQuery = compactVisualQuery(backgroundOriginalQuery) ?? topicToVisualQuery(opts.spec.topic);
     manifest.backgroundQuery = backgroundQuery;
 
+    // Pre-count how many times each normalised query appears in the script so we
+    // fetch exactly that many assets — no more. Capped at 3 to avoid over-fetching.
+    const queryDemand = new Map<string, number>();
+    for (const sentence of opts.spec.sentences) {
+      if (!sentence.needsImage || !sentence.visualQuery) continue;
+      const nq = compactVisualQuery(sentence.visualQuery);
+      if (!nq) continue;
+      queryDemand.set(nq, (queryDemand.get(nq) ?? 0) + 1);
+    }
+
     const backgroundSet = await saveEntryAsset({
       originalQuery: backgroundOriginalQuery,
       normalizedQuery: backgroundQuery,
       assetsDir,
       publicDir: opts.publicDir,
       providers,
-      maxAssets: 6,
+      maxAssets: 1,
     });
 
     if (backgroundSet) {
@@ -611,13 +621,14 @@ export async function resolveImageAssets(opts: {
       let querySet = cache.get(normalizedQuery) ?? null;
 
       if (querySet === null && !cache.has(normalizedQuery)) {
+        const demand = Math.min(queryDemand.get(normalizedQuery) ?? 1, 3);
         querySet = await saveEntryAsset({
           originalQuery: sentence.visualQuery,
           normalizedQuery,
           assetsDir,
           publicDir: opts.publicDir,
           providers,
-          maxAssets: 6,
+          maxAssets: demand,
         });
         cache.set(normalizedQuery, querySet);
         if (querySet) queryAssets.push(querySet);

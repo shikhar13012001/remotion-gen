@@ -2,9 +2,9 @@ import { Composition } from "remotion";
 import type { CalculateMetadataFunction } from "remotion";
 import type { Props } from "./compositions/ShortsComposition";
 import {
-  ModelContextProtocolComposition,
+  IntroducingTheModelContextComposition,
   TRANSITION_FRAMES,
-} from "./compositions/model-context-protocol/index";
+} from "./compositions/introducing-the-model-context/index";
 import script from "../data/output/script.json";
 import designTokensData from "../data/output/design_tokens.json";
 import imageManifestData from "../data/output/image_manifest.json";
@@ -23,9 +23,6 @@ const calculateMetadata: CalculateMetadataFunction<Props> = async ({ props }) =>
   return { durationInFrames: totalFrames };
 };
 
-/**
- * Transform script object into Props
- */
 function scriptToProps(script: {
   topic: string;
   total_words: number;
@@ -93,10 +90,9 @@ const props = scriptToProps(script);
 export const Root: React.FC = () => {
   return (
     <>
-      
       <Composition
-        id="ModelContextProtocolComposition"
-        component={ModelContextProtocolComposition}
+        id="IntroducingTheModelContextComposition"
+        component={IntroducingTheModelContextComposition}
         fps={FPS}
         width={1080}
         height={1920}
